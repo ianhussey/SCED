@@ -5,15 +5,15 @@
 # library("devtools")
 # devtools::install_github("klutometis/roxygen")
 library(roxygen2)
-# 
+#
 # # 2 working directory
 setwd("~/git/")
-# 
+#
 # # 3 create minimum folders
 # devtools::create("SCED")
 #
 # 4 write functions and documentation using roxygen formatting
-# Use below template and put these functions into the R folder. 
+# Use below template and put these functions into the R folder.
 #' A Cat Function
 #'
 #' This function allows you to express your love of cats.
@@ -44,7 +44,7 @@ library(devtools)
 setwd("~/git/")
 install("SCED")
 
-# 7 place in a GitHub repo 
+# 7 place in a GitHub repo
 
 # 8 installation for users
 
@@ -55,3 +55,4 @@ install("SCED")
 # load packages
 library(devtools)
 library(SCED)
+sced_analysis(simulated_data)
