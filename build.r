@@ -50,6 +50,7 @@ install("SCED")
 
 # install packages (first time only)
 #install.packages("devtools")
+#library(devtools)
 #install_github("ianhussey/SCED")
 # load packages
 library(devtools)

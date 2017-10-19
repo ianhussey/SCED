@@ -3,6 +3,7 @@
 #' Analyse data from an AB design SCED experiment using non-parametric frequentist tests
 #' @param data Experiment data
 #' @keywords SCED
+#' @export
 #' @examples
 #' sced_analysis(simulated_data)
 

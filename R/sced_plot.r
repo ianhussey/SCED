@@ -3,11 +3,13 @@
 #' Plot data from an AB design SCED experiment
 #' @param data Experiment data
 #' @keywords SCED
+#' @export
 #' @examples
 #' sced_plot(simulated_data)
 
 sced_plot <- function(data) {
   require(tidyverse)
+  require(ggplot2)
 
   data_with_condition_change <- data %>%
     group_by(participant) %>%
@@ -15,7 +17,7 @@ sced_plot <- function(data) {
     right_join(simulated_data, by = "participant")
 
   plot <-
-    ggplot(condition_change) +
+    ggplot(data_with_condition_change) +
     geom_smooth(aes(x = Timepoint, y = Score, color = Condition), method = "lm", alpha = 0.2) +  # or loess
     geom_point(aes(x = Timepoint, y = Score, color = Condition)) +
     geom_line(aes(x = Timepoint, y = Score, color = Condition)) +
