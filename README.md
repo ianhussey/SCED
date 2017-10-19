@@ -10,3 +10,12 @@ Ian Hussey (ian.hussey@ugent.be)
 
 GPLv3+
 
+## Installation
+
+```R
+install.packages("devtools")
+library(devtools)
+install_github("ianhussey/SCED")
+library(SCED)
+```
+
