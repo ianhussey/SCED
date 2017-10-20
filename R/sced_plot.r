@@ -21,7 +21,7 @@ sced_plot <- function(data) {
     geom_point(aes(x = Timepoint, y = Score, color = Condition)) +
     geom_line(aes(x = Timepoint, y = Score, color = Condition)) +
     scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-    geom_vline(xintercept = data_with_condition_change$condition_change, linetype = "dashed", color = "grey") +
+    geom_vline(aes(xintercept = data_with_condition_change$condition_change), linetype = "dashed", color = "grey") +
     theme_bw()+
     scale_color_manual(values=c("#09445a", "#cf6f77")) +
     facet_wrap(~Participant, ncol = 1, scales = "free_y")

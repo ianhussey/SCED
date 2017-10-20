@@ -37,5 +37,11 @@ Calculates the following statistics:
 
 ### simulate_ab_data(data)
 
-Simulate data that follows the required format of sced_analysis() and sced_plot(), using the simstudy package.
+Simulate data that meets the required format of sced_analysis() and sced_plot(), using the simstudy package.
 
+
+
+## To do
+
+- *p* value formatting needs attention: sometimes rounds, but sometimes reports scientific abbreviations.
+- Include analysis information in the plots?
