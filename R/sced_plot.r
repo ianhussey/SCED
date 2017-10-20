@@ -1,7 +1,7 @@
 #' Plot data
 #'
 #' Plot data from an AB design SCED experiment
-#' @param data Experiment data
+#' @param data Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.
 #' @export
 #' @examples
 #' sced_plot(data = simulated_data)
@@ -11,9 +11,9 @@ sced_plot <- function(data) {
   require(ggplot2)
 
   data_with_condition_change <- data %>%
-    group_by(participant) %>%
+    group_by(Participant) %>%
     summarize(condition_change = max(Timepoint[Condition == "A"]) + 0.5) %>%
-    right_join(data, by = "participant")
+    right_join(data, by = "Participant")
 
   plot <-
     ggplot(data_with_condition_change) +
@@ -24,7 +24,7 @@ sced_plot <- function(data) {
     geom_vline(xintercept = data_with_condition_change$condition_change, linetype = "dashed", color = "grey") +
     theme_bw()+
     scale_color_manual(values=c("#09445a", "#cf6f77")) +
-    facet_wrap(~participant, ncol = 1, scales = "free_y")
+    facet_wrap(~Participant, ncol = 1, scales = "free_y")
 
   return(plot)
 }

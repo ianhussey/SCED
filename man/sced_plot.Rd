@@ -7,7 +7,7 @@
 sced_plot(data)
 }
 \arguments{
-\item{data}{Experiment data}
+\item{data}{Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.}
 }
 \description{
 Plot data from an AB design SCED experiment

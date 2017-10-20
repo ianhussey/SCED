@@ -22,15 +22,14 @@ simulate_data <- function(participants = 10, timepoints = 15, cohens_d = 1.5) {
   # generate required number of data points using above parameters
   genData(participants*timepoints, parameters) %>%
     # create a participant variable
-    mutate(participant = ceiling(idnum/timepoints)) %>%
+    mutate(Participant = ceiling(idnum/timepoints)) %>%
     # create a timepoint variable
     rename(Timepoint = idnum) %>%
-    group_by(participant) %>%
+    group_by(Participant) %>%
     mutate(Timepoint = row_number()) %>%
     ungroup() %>%
     # reshape
     gather(Condition, Score, c("A", "B")) %>%
     mutate(Timepoint = ifelse(Condition == "B", Timepoint + timepoints, Timepoint)) %>%
-    arrange(participant) %>%
-    mutate(participant_string = paste("Participant", participant))
+    arrange(Participant)
 }
