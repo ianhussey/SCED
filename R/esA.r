@@ -1,6 +1,6 @@
 #' esA
 #'
-#' This function calculates a permutation test version of the A effect size by Ruscio (2008).
+#' This function calculates a permutation test version of Ruscio's A effect size (2008).
 #' Unlike McGraw & Wong's original method, which they called the Common Language Effect Size and which used an algebraic/normal approximation, this version makes no assumptions about the distribution of the data.
 #' Each X observation is paired to each Y observation. The proportion of XY pairs where X is higher than Y is then computed and output. Ties count as 0.5*TRUE.
 #' Code is adapted from https://janhove.github.io/reporting/2016/11/16/common-language-effect-sizes
@@ -10,7 +10,7 @@
 #' @param value1 assignement of group 1
 #' @param value2 assignement of group 2
 #' @param data data
-#' @return esA: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's *d* of 1.5 corrisponds to an *A* of 0.85.
+#' @return esA: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's d of 1.5 corrisponds to an Ruscio's A of 0.85.
 #' @export
 #' @examples
 #' A("Score", "Condition", data = data)

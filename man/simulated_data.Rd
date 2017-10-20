@@ -12,6 +12,6 @@ Generated using the simstudy R package.
 simulated_data
 }
 \description{
-A simulated dataset sampled from a true distribution of Cohen's *d* = 1.5.
+A simulated dataset sampled from a true distribution of Cohen's d = 1.5.
 }
 \keyword{datasets}

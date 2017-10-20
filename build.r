@@ -55,4 +55,3 @@ install("SCED")
 # load packages
 library(devtools)
 library(SCED)
-sced_analysis(data = simulated_data)
