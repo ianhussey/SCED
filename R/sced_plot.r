@@ -2,10 +2,8 @@
 #'
 #' Plot data from an AB design SCED experiment
 #' @param data Experiment data
-#' @keywords SCED
-#' @export
 #' @examples
-#' sced_plot(simulated_data)
+#' sced_plot(data = simulated_data)
 
 sced_plot <- function(data) {
   require(tidyverse)

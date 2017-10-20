@@ -13,6 +13,5 @@ sced_plot(data)
 Plot data from an AB design SCED experiment
 }
 \examples{
-sced_plot(simulated_data)
+sced_plot(data = simulated_data)
 }
-\keyword{SCED}
