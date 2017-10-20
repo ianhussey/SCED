@@ -10,11 +10,11 @@ sced_analysis(data)
 \item{data}{Experiment data. This must contain columns named "participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.}
 }
 \value{
-p: Permutation test *p* value. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
+p: Hypothesis test *p* value via permutation test. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
 
-esA: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's *d* of 1.5 corrisponds to an *A* of 0.85.
+A: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's *d* of 1.5 corrisponds to an *A* of 0.85.
 
-g: Hedge's *g* effect size, a version of Cohen's *d* that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's *d*. Included here for familiarity: it's parametric assumtions (normal distribution, equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts.
+g: Effect size Hedge's *g* effect size, a version of Cohen's *d* that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's *d*. Included here for familiarity: it's parametric assumtions (normal distribution, equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts.
 }
 \description{
 Analyse data from an AB design SCED experiment using non-parametric frequentist tests

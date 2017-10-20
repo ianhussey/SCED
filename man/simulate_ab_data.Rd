@@ -19,9 +19,14 @@ An arbitrary number of timepoints can be simulated, and an arbitrary true effect
 }
 \examples{
 # True effect size of Cohen's *d* = 1.5 and *A* = 0.85.
+# dependency
+library(simstudy)
+
+# paramters for data - true effect size of Cohen's *d* = 1.5
 parameters_d_1.5 <-
   defData(varname = "A", dist = "normal", formula = 0,   variance = 1, id = "idnum") \%>\%
   defData(varname = "B", dist = "normal", formula = 1.5, variance = 1, id = "idnum")
 
-sim <- simulate_ab_data(participants = 1000, timepoints = 15, parameters = parameters_d_1.5)
+# simulate data using these parameters
+sim <- simulate_ab_data(participants = 10, timepoints = 15, parameters = parameters_d_1.5)
 }
