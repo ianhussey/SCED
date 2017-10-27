@@ -20,7 +20,7 @@ sced_analysis <- function(data) {
   p_by_participant <- data %>%
     group_by(Participant) %>%
     do(p = pvalue(independence_test(Score ~ as.factor(Condition),
-                                    distribution = approximate(B = 10000),
+                                    distribution = approximate(B = 100000),
                                     data = .))) %>%
     ungroup() %>%
     mutate(p = as.numeric(p),
