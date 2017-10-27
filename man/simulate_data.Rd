@@ -18,7 +18,7 @@ simulate_data(participants = 10, timepoints_a = 15, timepoints_b = 15,
 }
 \description{
 Simulate data for an AB SCED design using simstudy
-An arbitrary number of timepoints can be simulated, and an arbitrary true effect size. An equal number of time points are created for the A and B conditions.
+An arbitrary number of timepoints can be simulated, and an arbitrary true effect size.
 }
 \examples{
 # True effect size of Cohen's d = 1.5 / A = 0.85.

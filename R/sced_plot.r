@@ -12,7 +12,7 @@ sced_plot <- function(data) {
 
   data_with_condition_change <- data %>%
     group_by(Participant) %>%
-    summarize(condition_change = max(Timepoint[Condition == "A"]) + 0.5) %>%
+    dplyr::summarize(condition_change = max(Timepoint[Condition == "A"]) + 0.5) %>%
     right_join(data, by = "Participant")
 
   plot <-

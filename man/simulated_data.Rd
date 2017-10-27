@@ -4,7 +4,7 @@
 \name{simulated_data}
 \alias{simulated_data}
 \title{Simulated AB SCED data}
-\format{A data frame with 300 rows and 5 variables, i.e., 15 data points in both A and B conditions and 10 participants.}
+\format{A data frame with 180 rows and 4 variables, representing 6 participants with a verying number of timepoints in the A vs B conditions.}
 \source{
 Generated using the simstudy R package.
 }
