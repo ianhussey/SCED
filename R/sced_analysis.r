@@ -42,7 +42,7 @@ sced_analysis <- function(data) {
   hedges_g_by_participant <- data %>%
     group_by(Participant) %>%
     do(hedges_g = bootES(.,
-                         R = 100,
+                         R = 10000,
                          data.col = "Score",
                          group.col = "Condition",
                          contrast = c(A = 1, B = -1),
@@ -55,7 +55,7 @@ sced_analysis <- function(data) {
   hedges_g_ci_lwr_by_participant <- data %>%
     group_by(Participant) %>%
     do(hedges_g_ci_lwr = bootES(.,
-                                R = 100,
+                                R = 10000,
                                 data.col = "Score",
                                 group.col = "Condition",
                                 contrast = c(A = 1, B = -1),
@@ -68,7 +68,7 @@ sced_analysis <- function(data) {
   hedges_g_ci_upr_by_participant <- data %>%
     group_by(Participant) %>%
     do(hedges_g_ci_upr = bootES(.,
-                                R = 100,
+                                R = 10000,
                                 data.col = "Score",
                                 group.col = "Condition",
                                 contrast = c(A = 1, B = -1),

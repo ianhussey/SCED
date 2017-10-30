@@ -10,10 +10,10 @@
 #' @param value1 assignement of group 1
 #' @param value2 assignement of group 2
 #' @param data data
-#' @return esA: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's d of 1.5 corrisponds to an Ruscio's A of 0.85.
+#' @return ruscios_A: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's d of 1.5 corrisponds to an Ruscio's A of 0.85.
 #' @export
 #' @examples
-#' A("Score", "Condition", data = data)
+#' ruscios_A(variable = "Score", group = "Condition", data = data)
 
 ruscios_A <- function(variable, group, data, value1 = 1, value2 = 0, runs = 10000) {
 

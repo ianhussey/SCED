@@ -3,14 +3,14 @@
 # # 1 dependencies
 # install.packages("devtools")
 # library("devtools")
-# devtools::install_github("klutometis/roxygen")
+# devtools::install_github("klutometis/NLP")
 library(roxygen2)
 #
 # # 2 working directory
 setwd("~/git/")
 #
 # # 3 create minimum folders
-# devtools::create("SCED")
+# devtools::create("NLP")
 #
 # 4 write functions and documentation using roxygen formatting
 # Use below template and put these functions into the R folder.
@@ -31,18 +31,17 @@ cat_function <- function(love=TRUE){
     print("I am not a cool person.")
   }
 }
-
 # 5 use roxygen to write the docs for the package
 
 library(devtools)
-setwd("~/git/SCED")
+setwd("~/git/NLP")
 document()
 
 # 6 install the package
 
 library(devtools)
 setwd("~/git/")
-install("SCED")
+install("NLP")
 
 # 7 place in a GitHub repo
 
@@ -51,7 +50,7 @@ install("SCED")
 # install packages (first time only)
 #install.packages("devtools")
 #library(devtools)
-#install_github("ianhussey/SCED")
+#install_github("ianhussey/NLP")
 # load packages
 library(devtools)
-library(SCED)
+library(NLP)

@@ -20,7 +20,7 @@ ruscios_A(variable, group, data, value1 = 1, value2 = 0, runs = 10000)
 \item{runs}{max number of permutations}
 }
 \value{
-esA: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's d of 1.5 corrisponds to an Ruscio's A of 0.85.
+ruscios_A: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's d of 1.5 corrisponds to an Ruscio's A of 0.85.
 }
 \description{
 This function calculates a permutation test version of Ruscio's A effect size (2008).
@@ -29,5 +29,5 @@ Each X observation is paired to each Y observation. The proportion of XY pairs w
 Code is adapted from https://janhove.github.io/reporting/2016/11/16/common-language-effect-sizes
 }
 \examples{
-A("Score", "Condition", data = data)
+ruscios_A(variable = "Score", group = "Condition", data = data)
 }
