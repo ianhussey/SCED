@@ -1,0 +1,72 @@
+---
+title: "Demonstration"
+author: "Ian Hussey"
+output: 
+  pdf_document:
+    highlight: haddock
+    latex_engine: xelatex
+---
+
+```{r include=FALSE}
+
+knitr::opts_chunk$set(message = FALSE, 
+                      warning = FALSE)
+
+```
+
+
+```{r}
+
+# dependencies
+library(SCED)
+library(knitr)
+library(tidyverse)
+
+# dependencies required by SCED
+library(broom)
+library(coin)
+library(survival)
+library(effsize)
+library(bootES)
+library(boot)
+library(stringr)
+library(timesavers)  # from github/ianhussey
+
+```
+
+
+```{r}
+
+# simulate data
+data <- simulate_data(participants = 2,    # two participants
+                      timepoints_a = 10,   # 10 timepoints pre 
+                      timepoints_b = 10,   # 10 post intervention
+                      cohens_d = 1.5) %>%  # Cohen's d = 1.5
+  mutate(Participant = paste("Participant", Participant))
+
+```
+
+
+```{r}
+
+# analyse
+results <- sced_analysis(data = data)
+
+```
+
+
+```{r}
+
+# summarise results in a table
+sced_summary(results = results) %>%
+  kable()
+
+```
+
+
+```{r fig.height=5, fig.width=5}
+
+# plot
+sced_plot(data = data)
+
+```

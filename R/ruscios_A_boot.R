@@ -27,9 +27,9 @@ ruscios_A_boot <- function(data, variable, group, value1, value2, B = 1000) {
                                    runs = 1000,
                                    data = .))) %>%
     ungroup() %>%
-    dplyr::summarize(ruscios_A_median = round(median(x), 3),
-                     ruscios_A_ci_lwr = round(quantile(x, 0.025), 3),
-                     ruscios_A_ci_upr = round(quantile(x, 0.975), 3))
+    dplyr::summarize(ruscios_A_median = round(median(x, na.rm = TRUE), 3),
+                     ruscios_A_ci_lwr = round(quantile(x, 0.025, na.rm = TRUE), 3),
+                     ruscios_A_ci_upr = round(quantile(x, 0.975, na.rm = TRUE), 3))
 
   return(ruscios_A_boot)
 }

@@ -13,7 +13,7 @@ sced_summary <- function(results) {
   require(stringr)
 
   results %>%
-    rename(`Median difference` = median_difference) %>%
+    dplyr::rename(`Median difference` = median_difference) %>%
     mutate(`Ruscio's A` = paste(ruscios_A_median, " [", ruscios_A_ci_lwr, ", ", ruscios_A_ci_upr, "]", sep = ""),
            `Hedges' g` = paste(hedges_g, " [", hedges_g_ci_lwr, ", ", hedges_g_ci_upr, "]", sep = "")) %>%
     dplyr::select(Participant, `Median difference`, `Ruscio's A`, `Hedges' g`, p)

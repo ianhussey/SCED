@@ -28,7 +28,7 @@ simulate_data <- function(participants = 10, timepoints_a = 15, timepoints_b = 1
     mutate(Participant = ceiling(idnum/timepoints_a),
            Condition = "A") %>%
     # create a timepoint variable
-    rename(Timepoint = idnum) %>%
+    dplyr::rename(Timepoint = idnum) %>%
     group_by(Participant) %>%
     mutate(Timepoint = row_number()) %>%
     ungroup()
@@ -38,7 +38,7 @@ simulate_data <- function(participants = 10, timepoints_a = 15, timepoints_b = 1
     mutate(Participant = ceiling(idnum/timepoints_b),
            Condition = "B") %>%
     # create a timepoint variable
-    rename(Timepoint = idnum) %>%
+    dplyr::rename(Timepoint = idnum) %>%
     group_by(Participant) %>%
     mutate(Timepoint = row_number() + timepoints_a) %>%
     ungroup()

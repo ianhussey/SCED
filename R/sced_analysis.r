@@ -29,9 +29,10 @@ sced_analysis <- function(data) {
 
   median_change <- data %>%
     group_by(Participant) %>%
-    summarize(median_a = median(Score[Condition == "A"]),
-              median_b = median(Score[Condition == "B"]),
-              median_difference = median_b - median_a) %>%
+    dplyr::summarize(median_a = median(Score[Condition == "A"]),
+                     median_b = median(Score[Condition == "B"]),
+                     median_difference = median_b - median_a,
+                     na.rm = TRUE) %>%
     dplyr::select(Participant, median_difference)
 
   # # consider adding bootstrapped unstandardised median difference scores
