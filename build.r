@@ -34,14 +34,14 @@ cat_function <- function(love=TRUE){
 # 5 use roxygen to write the docs for the package
 
 library(devtools)
-setwd("~/git/NLP")
+setwd("~/git/SCED")
 document()
 
 # 6 install the package
 
 library(devtools)
 setwd("~/git/")
-install("NLP")
+install("SCED")
 
 # 7 place in a GitHub repo
 
@@ -53,4 +53,4 @@ install("NLP")
 #install_github("ianhussey/NLP")
 # load packages
 library(devtools)
-library(NLP)
+library(SCED)

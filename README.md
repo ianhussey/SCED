@@ -44,6 +44,14 @@ Simulate data that meets the required format of sced_analysis() and sced_plot(),
 ## To do
 
 - *p* value formatting needs attention: sometimes rounds, but sometimes reports scientific abbreviations.
+
 - Include analysis information in the plots?
+
 - how to establish stability at baseline, either retrospectively or in an optional stopping fashion (i.e., optional condition switching once stability has been reached)?
   - Theil-Sen slope?
+
+- add bootstrapped CIs for Ruscio's A - drafted but throwing error
+
+- add additional terminology for the metric from Parker 2009. 
+
+  ​

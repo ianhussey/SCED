@@ -29,5 +29,5 @@ Each X observation is paired to each Y observation. The proportion of XY pairs w
 Code is adapted from https://janhove.github.io/reporting/2016/11/16/common-language-effect-sizes
 }
 \examples{
-ruscios_A(variable = "Score", group = "Condition", data = data)
+ruscios_A(variable = "Score", group = "Condition", value1 = "B", value2 = "A",  data = simulated_data)
 }

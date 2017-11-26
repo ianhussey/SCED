@@ -13,7 +13,7 @@
 #' @return ruscios_A: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's d of 1.5 corrisponds to an Ruscio's A of 0.85.
 #' @export
 #' @examples
-#' ruscios_A(variable = "Score", group = "Condition", data = data)
+#' ruscios_A(variable = "Score", group = "Condition", value1 = "B", value2 = "A",  data = simulated_data)
 
 ruscios_A <- function(variable, group, data, value1 = 1, value2 = 0, runs = 10000) {
 
@@ -27,10 +27,10 @@ ruscios_A <- function(variable, group, data, value1 = 1, value2 = 0, runs = 1000
   y <- data[data[[group]] == value2, variable]
 
   # Matrix with difference between XY for all pairs (Guillaume Rousselet's suggestion)
-  m <- outer(x,y,FUN="-")
+  m <- outer(x, y, FUN = "-")
 
   # Convert to booleans; count ties as half true.
-  m <- ifelse(m==0, 0.5, m>0)
+  m <- ifelse(m == 0, 0.5, m > 0)
 
   # Return proportion of TRUEs
   ruscios_A <- round(mean(m), 3)
