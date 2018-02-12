@@ -46,7 +46,10 @@ Convert the output of `sced_analysis()` to a printable table.
 
 ## To do
 
+- Highlight the median values in A and B with a different shaped dot?
+
 - How to establish stability at baseline, either retrospectively or in an optional stopping fashion (i.e., optional condition switching once stability has been reached)?
+
   - Theil-Sen slope would be more robust than the LSE slopes used in the plots. However, optional-transition designs would suffer from the changing power of the test as *n* grows.
 
 - Add additional other terminology for *A* from Parker (2009). 
