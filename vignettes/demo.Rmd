@@ -1,5 +1,6 @@
 ---
-title: "Demonstration"
+title: "SCED"
+subtitle: "Vignette"
 author: "Ian Hussey"
 output: 
   pdf_document:
@@ -13,7 +14,6 @@ knitr::opts_chunk$set(message = FALSE,
                       warning = FALSE)
 
 ```
-
 
 ```{r}
 
@@ -34,6 +34,7 @@ library(timesavers)  # from github/ianhussey
 
 ```
 
+# Simulate two participants
 
 ```{r}
 
@@ -46,7 +47,6 @@ data <- simulate_data(participants = 2,    # two participants
 
 ```
 
-
 ```{r}
 
 # analyse
@@ -54,6 +54,29 @@ results <- sced_analysis(data = data)
 
 ```
 
+```{r}
+
+# summarise results in a table
+sced_summary(results = results) %>%
+  kable()
+
+```
+
+```{r fig.height=5, fig.width=5}
+
+# plot
+sced_plot(data = data)
+
+```
+
+# Use in-built dataset that's a little more complex
+
+```{r}
+
+# analyse
+results <- sced_analysis(data = simulated_data)
+
+```
 
 ```{r}
 
@@ -64,9 +87,9 @@ sced_summary(results = results) %>%
 ```
 
 
-```{r fig.height=5, fig.width=5}
+```{r fig.height=10, fig.width=5}
 
 # plot
-sced_plot(data = data)
+sced_plot(data = simulated_data)
 
 ```

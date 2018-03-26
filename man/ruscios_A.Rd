@@ -4,7 +4,7 @@
 \alias{ruscios_A}
 \title{Ruscio's A}
 \usage{
-ruscios_A(variable, group, data, value1 = 1, value2 = 0, runs = 10000)
+ruscios_A(variable, group, data, value1 = 1, value2 = 0)
 }
 \arguments{
 \item{variable}{continuous variable}
@@ -16,8 +16,6 @@ ruscios_A(variable, group, data, value1 = 1, value2 = 0, runs = 10000)
 \item{value1}{assignement of group 1}
 
 \item{value2}{assignement of group 2}
-
-\item{runs}{max number of permutations}
 }
 \value{
 ruscios_A: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's d of 1.5 corrisponds to an Ruscio's A of 0.85.

@@ -12,19 +12,18 @@
 #' @return ruscios_A_ci_upr Upper 95% boostrapped confidence interval
 #' @export
 #' @examples
-#' ruscios_A_boot(variable = "Score", group = "Condition", value1 = "B", value2 = "A", B = 1000, data = simulated_data)
+#' ruscios_A_boot(variable = "Score", group = "Condition", value1 = "B", value2 = "A", runs = 1000, data = simulated_data)
 
-ruscios_A_boot <- function(data, variable, group, value1, value2, B = 1000) {
+ruscios_A_boot <- function(data, variable, group, value1, value2, runs = 1000) {
   require(tidyverse)
   require(broom)
 
   ruscios_A_boot <- data %>%
-    broom::bootstrap(B) %>%
+    broom::bootstrap(runs) %>%
     do(broom::tidy(SCED::ruscios_A(variable = variable,
                                    group = group,
                                    value1 = value1,
                                    value2 = value2,
-                                   runs = 1000,
                                    data = .))) %>%
     ungroup() %>%
     dplyr::summarize(ruscios_A_median = round(median(x, na.rm = TRUE), 3),

@@ -27,7 +27,7 @@ Simulate data that meets the required format of `sced_analysis()` and `sced_plot
 
 ### sced_plot()
 
-Separate conditions A and B for each each participant. Linear regression lines and error bars are included to make trends within and between conditions more apparent. 
+Panes represent individual participants with ID numbers included above each. Vertical dotted lines separate experimental conditions A and B (e.g., pre and post intervention). Horizontal dashed lines represent median values in each expeirmental condition. Linear regression lines and error bars are also included to higlight change trends within conditions. 
 
 ![plot](./screenshots/plot.png)
 
@@ -53,5 +53,7 @@ Convert the output of `sced_analysis()` to a printable table.
   - Theil-Sen slope would be more robust than the LSE slopes used in the plots. However, optional-transition designs would suffer from the changing power of the test as *n* grows.
 
 - Add additional other terminology for *A* from Parker (2009). 
+
+- Add random effects analysis (e.g., using the PIM package when updated to include random factors) and/or random effects meta analysis (e.g., using the metafor package).
 
   ​

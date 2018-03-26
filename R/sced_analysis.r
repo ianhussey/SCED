@@ -36,7 +36,7 @@ sced_analysis <- function(data) {
     dplyr::select(Participant, median_difference)
 
   # # consider adding bootstrapped unstandardised median difference scores
-  # median_diff <- function(data, B = 1000) {
+  # median_diff <- function(data, runs = 1000) {
   #   data %>%
   #     group_by(Participant) %>%
   #     broom::bootstrap(B) %>%
@@ -47,7 +47,7 @@ sced_analysis <- function(data) {
   #                      dplyr::select(Participant, median_difference))) %>%
   #     ungroup()
   # }
-  # median_diff(data = simulated_data, B = 1000)
+  # median_diff(data = simulated_data, runs = 1000)
 
   # bootstrapped Ruscio's nonparametric effect size A
   ruscios_A_by_participant <- data %>%
@@ -57,7 +57,7 @@ sced_analysis <- function(data) {
                                   data = .,
                                   value1 = "A",
                                   value2 = "B",
-                                  B = 10000)) %>%
+                                  runs = 10000)) %>%
     ungroup() %>%
     # I should do list-flattening here, but the below hacky solution works
     mutate(ruscios_A = str_replace(ruscios_A, "list\\(", ""),

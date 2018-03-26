@@ -8,25 +8,27 @@
 
 sced_plot <- function(data) {
   require(tidyverse)
-  require(ggplot2)
 
   data_with_condition_change <- data %>%
     group_by(Participant) %>%
     dplyr::summarize(condition_change = max(Timepoint[Condition == "A"]) + 0.5) %>%
-    right_join(data, by = "Participant")
-
-  plot <-
+    right_join(data, by = "Participant") %>%
+    group_by(Participant, Condition) %>%
+    mutate(median_score = median(Score)) %>%
+    ungroup()
+    
+  plot <- 
     ggplot(data_with_condition_change) +
-    geom_smooth(aes(x = Timepoint, y = Score, color = Condition), method = "lm", alpha = 0.15) +  # or loess
-    geom_point(aes(x = Timepoint, y = Score, color = Condition)) +
-    geom_line(aes(x = Timepoint, y = Score, color = Condition)) +
+    geom_smooth(aes(x = Timepoint, y = Score, group = Condition), method = "lm", alpha = 0.15, colour = "black") +  # or loess
+    geom_line(aes(x = Timepoint, y = median_score, group = Condition), linetype = "dashed") +
+    geom_point(aes(x = Timepoint, y = Score, group = Condition)) +  # , color = is_median_color
+    geom_line(aes(x = Timepoint, y = Score, group = Condition)) +
     scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-    geom_vline(aes(xintercept = data_with_condition_change$condition_change), linetype = "dashed", color = "black") +
+    geom_vline(aes(xintercept = data_with_condition_change$condition_change), linetype = "dotted", color = "black") +
     theme_classic() +
-    #scale_color_manual(values = c("#09445a", "#cf6f77")) +
-    scale_color_manual(values = c("#000000", "#000000")) +
+    scale_color_manual(values = c("#000000", "#bc1414")) +  # second color for median highlights, to be added.
     theme(legend.position = "none") +
-    facet_wrap(~Participant, ncol = 1, scales = "free_y")
+    facet_wrap(~Participant, ncol = 1)
 
   return(plot)
 }

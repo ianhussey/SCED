@@ -4,7 +4,7 @@
 \alias{ruscios_A_boot}
 \title{Bootstrapped Ruscio's A}
 \usage{
-ruscios_A_boot(data, variable, group, value1, value2, B = 1000)
+ruscios_A_boot(data, variable, group, value1, value2, runs = 1000)
 }
 \arguments{
 \item{data}{data}
@@ -30,5 +30,5 @@ ruscios_A_ci_upr Upper 95% boostrapped confidence interval
 This function bootstraps confidence intervals for Ruscio's A effect size (2008).
 }
 \examples{
-ruscios_A_boot(variable = "Score", group = "Condition", value1 = "B", value2 = "A", B = 1000, data = simulated_data)
+ruscios_A_boot(variable = "Score", group = "Condition", value1 = "B", value2 = "A", runs = 1000, data = simulated_data)
 }
