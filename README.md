@@ -44,6 +44,8 @@ Calculates the following statistics:
 
 Convert the output of `sced_analysis()` to a printable table.
 
+![plot](./screenshots/table.png)
+
 ## To do
 
 - Highlight the median values in A and B with a different shaped dot?

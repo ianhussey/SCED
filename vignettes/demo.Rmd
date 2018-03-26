@@ -32,6 +32,9 @@ library(boot)
 library(stringr)
 library(timesavers)  # from github/ianhussey
 
+# disable scientific notation
+options(scipen = 999) 
+
 ```
 
 # Simulate two participants
