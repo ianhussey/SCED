@@ -8,6 +8,7 @@
 
 sced_plot <- function(data) {
   require(tidyverse)
+  require(forcats)
 
   data_with_condition_change <- data %>%
     group_by(Participant) %>%
@@ -24,7 +25,8 @@ sced_plot <- function(data) {
     ungroup()
   
   plot_data <- data_with_condition_change %>%
-    mutate(Participant = fct_reorder(Participant, intervention_point))
+    left_join(intervention_point, by = "Participant") %>%
+    mutate(Participant = forcats::fct_reorder(Participant, intervention_point))
     
   plot <- 
     ggplot(plot_data) +
