@@ -26,7 +26,9 @@ sced_meta_analysis <- function(results) {
     )
   
   # fit Random Effects model using metafor package
-  fit <- rma(yi, vi, data = data_for_meta_analysis)
+  fit <- rma(yi, vi, 
+             data = data_for_meta_analysis,
+             slab = paste(Participant))
   
   # make predictions converting to odds ratios
   Ruscios_A_predictions <- 
