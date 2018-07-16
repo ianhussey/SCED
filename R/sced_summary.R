@@ -5,7 +5,7 @@
 #' @return a data frame with formatted results
 #' @export
 #' @examples
-#' sced_summary(sced_results)
+#' sced_summary(results = sced_results)
 
 sced_summary <- function(results) {
   require(timesavers)

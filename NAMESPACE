@@ -3,6 +3,7 @@
 export(ruscios_A)
 export(ruscios_A_boot)
 export(sced_analysis)
+export(sced_meta_analysis)
 export(sced_plot)
 export(sced_summary)
 export(simulate_data)

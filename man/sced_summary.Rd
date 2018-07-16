@@ -16,5 +16,5 @@ a data frame with formatted results
 Summarise output of sced_analysis in a table for printing.
 }
 \examples{
-sced_summary(sced_results)
+sced_summary(results = sced_results)
 }

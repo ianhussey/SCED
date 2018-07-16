@@ -10,7 +10,7 @@
 #' @examples
 #' # True effect size of Cohen's d = 1.5 / A = 0.85.
 #' # simulate data using these parameters
-#' sim <- simulate_ab_data(participants = 10, timepoints = 15, cohens_d = 1.5)
+#' sim <- simulate_data(participants = 10, timepoints_a = 15, timepoints_b = 15, cohens_d = 1.5)
 
 simulate_data <- function(participants = 10, timepoints_a = 15, timepoints_b = 15, cohens_d = 1.5) {
   require(simstudy)
