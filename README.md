@@ -1,6 +1,6 @@
 # SCED
 
-An R package for analysis of AB Single Case Experiment Design data using [exact tests](https://en.wikipedia.org/wiki/Exact_test) and [robust effect sizes](https://www.ncbi.nlm.nih.gov/pubmed/18331151).
+An R package for robust analysis, plotting and meta analysis of data from A-B Single Case Experiment Designs using [exact tests](https://en.wikipedia.org/wiki/Exact_test) and [robust effect sizes](https://www.ncbi.nlm.nih.gov/pubmed/18331151).
 
 ## Author
 
@@ -46,16 +46,23 @@ Convert the output of `sced_analysis()` to a printable table.
 
 ![plot](./screenshots/table.png)
 
+### sced_meta_analysis()
+
+Conduct a random effects meta analysis of the robust standardized effect sizes (Ruscio's A values) from  `sced_analysis()`. Produces a meta analytic effect size, 95% confidence intervals, 95% credibility intervals (also referred to as prediction intervals), measures of heterogeneity between participants, and a forest plot of the effect sizes and meta analysed effect size. 
+
 ## To do
 
-- Highlight the median values in A and B with a different shaped dot?
+- Change forest plot to display probability values (ie native Ruscio's A values) rather than odds ratios.
+
+- Change CIs in the meta analysis to using bootstrapping rather than Wald estimation
+
+  - http://www.metafor-project.org/doku.php/tips:bootstrapping_with_ma
+  - Possibly also CIs for heterogeneity metrics, see https://rdrr.io/cran/metafor/man/robust.html
 
 - How to establish stability at baseline, either retrospectively or in an optional stopping fashion (i.e., optional condition switching once stability has been reached)?
 
-  - Theil-Sen slope would be more robust than the LSE slopes used in the plots. However, optional-transition designs would suffer from the changing power of the test as *n* grows.
+  - Theil-Sen slope would be more robust than the OLS slopes used in the plots. However, optional-transition designs would suffer from the changing power of the test as *n* grows. All methods I know of are unrobust or have power problems. For the moment, I rely on visual inspection of the OLS linear regression line. 
 
 - Add additional other terminology for *A* from Parker (2009). 
-
-- Add random effects analysis (e.g., using the PIM package when updated to include random factors) and/or random effects meta analysis (e.g., using the metafor package).
 
   ​
