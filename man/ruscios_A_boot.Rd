@@ -4,7 +4,7 @@
 \alias{ruscios_A_boot}
 \title{Bootstrapped Ruscio's A}
 \usage{
-ruscios_A_boot(data, variable, group, value1, value2, runs = 1000)
+ruscios_A_boot(data, variable, group, value1 = 1, value2 = 0, runs = 1000)
 }
 \arguments{
 \item{data}{data}
@@ -13,14 +13,14 @@ ruscios_A_boot(data, variable, group, value1, value2, runs = 1000)
 
 \item{group}{dichotomous group}
 
-\item{value1}{assignement of group 1}
+\item{value1}{assignment of group 1}
 
-\item{value2}{assignement of group 2}
+\item{value2}{assignment of group 2}
 
-\item{B}{Number of boostrapped resamples}
+\item{runs}{Number of boostrapped resamples}
 }
 \value{
-ruscios_A_median Median boostrapped estimation of Ruscio's A.
+ruscios_A_estimate Median boostrapped estimation of Ruscio's A.
 
 ruscios_A_ci_lwr Lower 95% boostrapped confidence interval
 
