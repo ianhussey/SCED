@@ -9,37 +9,36 @@
 sced_plot <- function(data) {
   require(tidyverse)
   require(forcats)
-
-  data_with_condition_change <- data %>%
-    group_by(Participant) %>%
-    dplyr::summarize(condition_change = max(Timepoint[Condition == "A"]) + 0.5) %>%
-    right_join(data, by = "Participant") %>%
-    group_by(Participant, Condition) %>%
-    mutate(median_score = median(Score)) %>%
+  
+  data_with_condition_change <- data %>% 
+    group_by(Participant) %>% 
+    dplyr::summarize(condition_change = max(Timepoint[Condition == "A"]) + 0.5) %>% 
+    right_join(data, by = "Participant") %>% 
+    group_by(Participant, Condition) %>% mutate(median_score = median(Score)) %>% 
     ungroup()
   
-  intervention_point <- data %>%
-    filter(Condition == "B") %>%
-    group_by(Participant) %>%
-    summarize(intervention_point = min(Timepoint)) %>%
+  intervention_point <- data %>% 
+    filter(Condition == "B") %>% 
+    group_by(Participant) %>% 
+    summarize(intervention_point = min(Timepoint)) %>% 
     ungroup()
   
-  plot_data <- data_with_condition_change %>%
-    left_join(intervention_point, by = "Participant") %>%
-    mutate(Participant = forcats::fct_reorder(Participant, intervention_point))
-    
-  plot <- 
-    ggplot(plot_data) +
-    geom_smooth(aes(x = Timepoint, y = Score, group = Condition), method = "lm", alpha = 0.15, colour = "black") +  # or loess
-    geom_line(aes(x = Timepoint, y = median_score, group = Condition), linetype = "dashed") +
-    geom_point(aes(x = Timepoint, y = Score, group = Condition)) +  # , color = is_median_color
-    geom_line(aes(x = Timepoint, y = Score, group = Condition)) +
-    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-    geom_vline(aes(xintercept = condition_change), linetype = "dotted", color = "black") +
-    theme_classic() +
-    scale_color_manual(values = c("#000000", "#bc1414")) +  # second color for median highlights, to be added.
-    theme(legend.position = "none") +
+  plot_data <- data_with_condition_change %>% 
+    left_join(intervention_point, by = "Participant") %>% 
+    mutate(Participant = as.factor(Participant)) %>%
+    dplyr::mutate(Participant = forcats::fct_reorder(Participant, intervention_point))
+  
+  plot <- ggplot(plot_data) + 
+    geom_smooth(aes(x = Timepoint, y = Score, group = Condition), 
+                method = "lm", alpha = 0.15, colour = "black") + 
+    geom_line(aes(x = Timepoint, y = median_score, group = Condition), linetype = "dashed") + 
+    geom_point(aes(x = Timepoint, y = Score, group = Condition)) + 
+    geom_line(aes(x = Timepoint, y = Score, group = Condition)) + 
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) + 
+    geom_vline(aes(xintercept = condition_change), linetype = "dotted", 
+               color = "black") + theme_classic() + scale_color_manual(values = c("#000000", "#bc1414")) + 
+    theme(legend.position = "none") + 
     facet_wrap(~Participant, ncol = 1)
-
+  
   return(plot)
 }

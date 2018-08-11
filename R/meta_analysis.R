@@ -28,10 +28,15 @@ sced_meta_analysis <- function(results) {
   # get data
   data_for_meta_analysis <- results %>%
     mutate(
+      # probabilties of 1 or 0 return Inf and -Inf, so recode to asymptotic values
+      ruscios_A_ci_lwr = ifelse(ruscios_A_ci_lwr == 1, 0.99, 
+                                ifelse(ruscios_A_ci_lwr == 0, 0.01, ruscios_A_ci_lwr)),
+      ruscios_A_ci_upr = ifelse(ruscios_A_ci_upr == 1, 0.99,
+                                ifelse(ruscios_A_ci_upr == 0, 0.01, ruscios_A_ci_upr)),
       # convert probabilties to odds ratios
       or = ruscios_A / (1 - ruscios_A),
-      or_ci_lower = ruscios_A_ci_lwr / (1 - ruscios_A_ci_lwr),
-      or_ci_upper = ruscios_A_ci_upr / (1 - ruscios_A_ci_upr),
+      or_ci_lower = ruscios_A_ci_upr / (1 - ruscios_A_ci_upr),
+      or_ci_upper = ruscios_A_ci_lwr / (1 - ruscios_A_ci_lwr),
       # convert odds ratios to log odds
       yi = log(or),
       # convert CIs to SEs

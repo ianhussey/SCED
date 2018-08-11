@@ -2,10 +2,10 @@
 title: "SCED"
 subtitle: "Vignette"
 author: "Ian Hussey"
-output: 
-  pdf_document:
+output:
+  html_document:
+    df_print: paged
     highlight: haddock
-    latex_engine: xelatex
 ---
 
 ```{r include=FALSE}
@@ -59,8 +59,10 @@ results <- sced_analysis(data = data)
 
 ```{r}
 
-# summarise results in a table
-sced_summary(results = results) %>%
+# sced_summary(results = results) %>%
+#   kable()
+
+results %>%
   kable()
 
 ```
@@ -83,8 +85,12 @@ results <- sced_analysis(data = simulated_data)
 
 ```{r}
 
+# # summarise results in a table
+# sced_summary(results = results) %>%
+#   kable()
+
 # summarise results in a table
-sced_summary(results = results) %>%
+results %>%
   kable()
 
 ```
@@ -102,16 +108,17 @@ sced_plot(data = simulated_data)
 # meta analysis
 meta_analysis <- sced_meta_analysis(results = results)
 
-meta_analysis$meta_effect
-meta_analysis$meta_heterogeneity
-
-# plot
+# forest plot
 forest(meta_analysis$model_fit, 
-       addcred = TRUE,
-       atransf = exp)  # credibility intervals)
-## add column headings to the plot
-text(-6.3, 6.8, "Participant", pos = 4)
-text( 8.4, 6.8, "Odds Ratio [95% CI]", pos = 2)
+       xlab = "Odds ratio",
+       digits = 2,
+       atransf = exp,
+       addcred = TRUE) 
 
 ```
+
+`r meta_analysis$meta_effect`
+
+`r meta_analysis$meta_heterogeneity`
+
 

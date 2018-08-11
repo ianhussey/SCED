@@ -75,8 +75,8 @@ sced_analysis <- function(data, n_boots = 10000) {
                   ruscios_A = str_replace(ruscios_A, "ruscios_A_ci_upr = ", ""),
                   ruscios_A = str_replace(ruscios_A, "\\)", "")) %>%
     tidyr::separate(ruscios_A, into = c("ruscios_A_ci_lwr", "ruscios_A_ci_upr"), sep = ",") %>%
-    dplyr::mutate(temp1  = round(1 - as.numeric(ruscios_A_ci_lwr), 3),  # the upr and lwr CIs are then swapped so that the ES can be inverted
-                  temp2  = round(1 - as.numeric(ruscios_A_ci_upr), 3)) %>%
+    dplyr::mutate(temp1  = round(as.numeric(ruscios_A_ci_lwr), 3),  # the upr and lwr CIs are then swapped so that the ES can be inverted
+                  temp2  = round(as.numeric(ruscios_A_ci_upr), 3)) %>%
     dplyr::select(-ruscios_A_ci_lwr, -ruscios_A_ci_upr) %>%
     dplyr::rename(ruscios_A_ci_lwr = temp2,
                   ruscios_A_ci_upr = temp1) %>%
