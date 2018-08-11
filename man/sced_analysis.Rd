@@ -4,7 +4,7 @@
 \alias{sced_analysis}
 \title{Analyse data}
 \usage{
-sced_analysis(data)
+sced_analysis(data, n_boots = 10000)
 }
 \arguments{
 \item{data}{Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.}

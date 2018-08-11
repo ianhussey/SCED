@@ -45,7 +45,7 @@ options(scipen = 999)
 data <- simulate_data(participants = 2,    # two participants
                       timepoints_a = 10,   # 10 timepoints pre 
                       timepoints_b = 10,   # 10 post intervention
-                      cohens_d = 1.5) %>%  # Cohen's d = 1.5
+                      cohens_d = 1) %>%  # Cohen's d = 1.5
   mutate(Participant = paste("Participant", Participant))
 
 ```
@@ -96,3 +96,22 @@ sced_summary(results = results) %>%
 sced_plot(data = simulated_data)
 
 ```
+
+```{r}
+
+# meta analysis
+meta_analysis <- sced_meta_analysis(results = results)
+
+meta_analysis$meta_effect
+meta_analysis$meta_heterogeneity
+
+# plot
+forest(meta_analysis$model_fit, 
+       addcred = TRUE,
+       atransf = exp)  # credibility intervals)
+## add column headings to the plot
+text(-6.3, 6.8, "Participant", pos = 4)
+text( 8.4, 6.8, "Odds Ratio [95% CI]", pos = 2)
+
+```
+

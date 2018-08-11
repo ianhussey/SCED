@@ -32,7 +32,8 @@ ruscios_A <- function(variable, group, data, value1 = 1, value2 = 0) {
   m <- ifelse(m == 0, 0.5, m > 0)
 
   # Return proportion of TRUEs
-  ruscios_A <- round(mean(m), 3)
+  ruscios_A <- 1 - round(mean(m), 3)
 
   return(as.numeric(ruscios_A))
 }
+

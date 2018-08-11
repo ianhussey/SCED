@@ -17,14 +17,14 @@
 ruscios_A_boot <- function(data, variable, group, value1 = 1, value2 = 0, runs = 1000) {
   require(tidyverse)
   require(broom)
-  ruscios_A_results <- predictions_1 %>%
+  ruscios_A_results <- data %>%
     SCED::ruscios_A(variable = variable,
                     group = group,
                     value1 = value1,
                     value2 = value2,
                     data = .)
   
-  ruscios_A_boot_results <- predictions_1 %>%
+  ruscios_A_boot_results <- data %>%
     broom::bootstrap(runs) %>%
     do(broom::tidy(SCED::ruscios_A(variable = variable,
                                    group = group,
@@ -32,9 +32,11 @@ ruscios_A_boot <- function(data, variable, group, value1 = 1, value2 = 0, runs =
                                    value2 = value2,
                                    data = .))) %>%
     ungroup() %>%
-    dplyr::summarize(ruscios_A_ci_lwr = round(quantile(x, 0.025, na.rm = TRUE), 3),
-                     ruscios_A_ci_upr = round(quantile(x, 0.975, na.rm = TRUE), 3)) %>%
-    mutate(ruscios_A_estimate = ruscios_A_results)
-  
+    dplyr::summarize(ruscios_A_ci_upr = round(quantile(x, 0.025, na.rm = TRUE), 3),
+                     ruscios_A_ci_lwr = round(quantile(x, 0.975, na.rm = TRUE), 3)) 
+  # %>%
+  #   dplyr::mutate(ruscios_A_ci_lwr = ifelse(is.na(ruscios_A_ci_lwr), 1, ruscios_A_ci_lwr),
+  #                 ruscios_A_ci_upr = ifelse(is.na(ruscios_A_ci_upr), 1, ruscios_A_ci_upr))
+
   return(ruscios_A_boot_results)
 }
