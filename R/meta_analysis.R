@@ -11,13 +11,15 @@
 #' meta_analysis$meta_effect
 #' meta_analysis$meta_heterogeneity
 #' 
-#' # forest plot
+#' # Forest plot
 #' forest(meta_analysis$model_fit, 
-#'        xlab = "Odds ratio", 
-#'        addcred = TRUE)  # credibility intervals
-#' ## add column headings to the plot
-#' text(-6.3, 6.8, "Participant", pos = 4)
-#' text( 8.4, 6.8, "Odds Ratio [95% CI]", pos = 2)
+#'     xlab = "Odds ratio",    
+#'     digits = 2,
+#'     atransf = exp,  ## transf = exp ## also available
+#'     addcred = TRUE) 
+#'     ## add column headings to the plot
+#'     text(-6.3, 6.8, "Participant", pos = 4)
+#'     text( 8.4, 6.8, "Odds Ratio [95% CI]", pos = 2)
 
 sced_meta_analysis <- function(results) {
   require(tidyverse)
@@ -50,8 +52,8 @@ sced_meta_analysis <- function(results) {
     gather() %>%
     mutate(value = value/(1 + value)) %>%
     round_df(3) %>%
-    rename(metric = key,
-           estimate = value) %>%
+    dplyr::rename(metric = key,
+                  estimate = value) %>%
     mutate(metric = dplyr::recode(metric,
                                     "pred" = "Meta analysed Ruscio's A",
                                     "ci.lb" = "95% CI lower",
@@ -61,7 +63,7 @@ sced_meta_analysis <- function(results) {
   
   meta_effect_string <- 
     paste0("Meta analysis: k = ", meta_fit$k, 
-           ", OR = ", predictions$estimate[1],
+           ", Ruscio's A = ", predictions$estimate[1],
            ", 95% CI [", predictions$estimate[2], ", ", predictions$estimate[3], "]",
            ", 95% CR [", predictions$estimate[4], ", ", predictions$estimate[5], "]")
   
