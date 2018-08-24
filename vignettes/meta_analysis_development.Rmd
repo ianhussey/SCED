@@ -20,11 +20,14 @@ knitr::opts_chunk$set(message=FALSE,
 ```{r}
 
 # dependencies
-library(SCED)
+# library(devtools)
+# install_github("ianhussey/SCED")
+# install_github("ianhussey/timesavers")
+library(SCED)  # from github/ianhussey
 library(knitr)
 library(tidyverse)
 
-# dependencies required by SCED
+# dependencies required by SCED package
 library(broom)
 library(coin)
 library(survival)
