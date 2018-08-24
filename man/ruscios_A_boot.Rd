@@ -2,9 +2,10 @@
 % Please edit documentation in R/ruscios_A_boot.R
 \name{ruscios_A_boot}
 \alias{ruscios_A_boot}
-\title{Bootstrapped Ruscio's A}
+\title{Bootstrapped Ruscio's A with 95% CIs and standard error}
 \usage{
-ruscios_A_boot(data, variable, group, value1 = 1, value2 = 0, runs = 1000)
+ruscios_A_boot(data, variable, group, value1 = 1, value2 = 0, B = 2000,
+  Conf.Level = 0.95, seed = 1)
 }
 \arguments{
 \item{data}{data}
@@ -17,18 +18,25 @@ ruscios_A_boot(data, variable, group, value1 = 1, value2 = 0, runs = 1000)
 
 \item{value2}{assignment of group 2}
 
-\item{runs}{Number of boostrapped resamples}
+\item{B}{Number of boostrapped resamples}
+
+\item{Conf.Level}{1 - alpha value (e.g., .95).}
+
+\item{seed}{seed value for reproducability}
 }
 \value{
-ruscios_A_estimate Median boostrapped estimation of Ruscio's A.
+ruscios_A_estimate Ruscio's A.
 
-ruscios_A_ci_lwr Lower 95% boostrapped confidence interval
+ruscios_A_se Standard error of bootstrapped Ruscio's A values.
 
-ruscios_A_ci_upr Upper 95% boostrapped confidence interval
+ruscios_A_ci_lwr Lower 95% bootstrapped confidence interval via the BCA method
+
+ruscios_A_ci_upr Upper 95% bootstrapped confidence interval via the BCA method
 }
 \description{
-This function bootstraps confidence intervals for Ruscio's A effect size (2008).
+This function bootstraps confidence intervals for Ruscio's A effect size (2008). 
+Code adapted from adapted from John Ruscio's original implementation of his metric: https://ruscio.pages.tcnj.edu/quantitative-methods-program-code/
 }
 \examples{
-ruscios_A_boot(variable = "Score", group = "Condition", value1 = "B", value2 = "A", runs = 1000, data = simulated_data)
+ruscios_A_boot(data = simulated_data, variable = "Score", group = "Condition", value1 = "B", value2 = "A")
 }

@@ -10,7 +10,7 @@
 #' @examples
 #' sced_results <- sced_analysis(data = simulated_data)
 
-sced_analysis <- function(data, n_boots = 10000) {
+sced_analysis <- function(data, n_boots = 2000) {
   require(tidyverse)
   require(coin)
   require(effsize)
@@ -21,7 +21,7 @@ sced_analysis <- function(data, n_boots = 10000) {
   p_by_participant <- data %>%
     dplyr::group_by(Participant) %>%
     do(p = pvalue(independence_test(Score ~ as.factor(Condition),
-                                    distribution = approximate(B = n_boots),
+                                    distribution = approximate(B = n_boots*10), # needs more than other tests
                                     data = .))) %>%
     ungroup() %>%
     dplyr::mutate(p = as.numeric(p),
@@ -35,103 +35,49 @@ sced_analysis <- function(data, n_boots = 10000) {
                      na.rm = TRUE) %>%
     dplyr::select(Participant, median_difference)
   
-  # # consider adding bootstrapped unstandardised median difference scores
-  # median_diff <- function(data, runs = n_boots) {
-  #   data %>%
-  #     group_by(Participant) %>%
-  #     broom::bootstrap(B) %>%
-  #     do(broom::tidy(summarize(data = .,
-  #                              median_a = median(Score[Condition == "A"]),
-  #                              median_b = median(Score[Condition == "B"]),
-  #                              median_difference = median_b - median_a) %>%
-  #                      dplyr::select(Participant, median_difference))) %>%
-  #     ungroup()
-  # }
-  # median_diff(data = simulated_data, runs = 1000)
-  
   # bootstrapped Ruscio's nonparametric effect size A
-  ruscios_A_by_participant <- data %>%
-    group_by(Participant) %>%
-    do(ruscios_A = ruscios_A(variable = "Score",
-                             group = "Condition",
-                             data = .,
-                             value1 = "A",
-                             value2 = "B")) %>%
-    ungroup() %>%
-    mutate(ruscios_A = as.numeric(ruscios_A))
-  
+  # function defined elsewhere in this package
   ruscios_A_boot_by_participant <- data %>%
     group_by(Participant) %>%
-    do(ruscios_A = ruscios_A_boot(variable = "Score",
-                                  group = "Condition",
-                                  data = .,
-                                  value1 = "A",
-                                  value2 = "B",
-                                  runs = n_boots)) %>%
-    ungroup() %>%
-    # I should do list-flattening here, but the below hacky solution works
-    dplyr::mutate(ruscios_A = str_replace(ruscios_A, "list\\(", ""),
-                  ruscios_A = str_replace(ruscios_A, "ruscios_A_ci_lwr = ", ""),
-                  ruscios_A = str_replace(ruscios_A, "ruscios_A_ci_upr = ", ""),
-                  ruscios_A = str_replace(ruscios_A, "\\)", "")) %>%
-    tidyr::separate(ruscios_A, into = c("ruscios_A_ci_lwr", "ruscios_A_ci_upr"), sep = ",") %>%
-    dplyr::mutate(temp1  = round(as.numeric(ruscios_A_ci_lwr), 3),  # the upr and lwr CIs are then swapped so that the ES can be inverted
-                  temp2  = round(as.numeric(ruscios_A_ci_upr), 3)) %>%
-    dplyr::select(-ruscios_A_ci_lwr, -ruscios_A_ci_upr) %>%
-    dplyr::rename(ruscios_A_ci_lwr = temp2,
-                  ruscios_A_ci_upr = temp1) %>%
-    # dplyr::mutate(ruscios_A_ci_lwr = ifelse(is.na(ruscios_A_ci_lwr), 1, ruscios_A_ci_lwr),
-    #               ruscios_A_ci_upr = ifelse(is.na(ruscios_A_ci_upr), 1, ruscios_A_ci_upr)) %>%
-    dplyr::select(Participant, ruscios_A_ci_lwr, ruscios_A_ci_upr)
-  
+    do(ruscios_A_boot(variable = "Score",
+                      group = "Condition",
+                      data = .,
+                      value1 = "B",
+                      value2 = "A",
+                      B = n_boots)) %>%
+    ungroup()
+
   # bootstrapped Hedges' g effect size (removes assumption of normality but not equality of variances or equal N per condition)
+  hedges_g_boot <- function(data) {
+    require(bootES)
+    require(tidyverse)
+    
+    fit <- data %>%
+      bootES(.,
+             R = n_boots,
+             data.col = "Score",
+             group.col = "Condition",
+             contrast = c(A = -1, B = 1),
+             effect.type = "hedges.g",
+             ci.type = "bca",
+             ci.conf = 0.95)
+    
+    results <- data.frame(hedges_g        = round(fit$t0,        3),
+                          hedges_g_se     = round(sd(fit$t),     3),
+                          hedges_g_ci_lwr = round(fit$bounds[1], 3),
+                          hedges_g_ci_upr = round(fit$bounds[2], 3))
+  }
+  
   hedges_g_by_participant <- data %>%
     group_by(Participant) %>%
-    do(hedges_g = bootES(.,
-                         R = n_boots,
-                         data.col = "Score",
-                         group.col = "Condition",
-                         contrast = c(A = 1, B = -1),
-                         effect.type = "hedges.g",
-                         ci.type = "bca",
-                         ci.conf = 0.95)$t0) %>%
-    ungroup() %>%
-    dplyr::mutate(hedges_g = round(as.numeric(hedges_g), 2)*-1)  # needs to be reverse scored
-  
-  hedges_g_ci_lwr_by_participant <- data %>%
-    dplyr::group_by(Participant) %>%
-    do(hedges_g_ci_lwr = bootES(.,
-                                R = n_boots,
-                                data.col = "Score",
-                                group.col = "Condition",
-                                contrast = c(A = 1, B = -1),
-                                effect.type = "hedges.g",
-                                ci.type = "bca",
-                                ci.conf = 0.95)$bounds[2]) %>%
-    ungroup() %>%
-    dplyr::mutate(hedges_g_ci_lwr = round(as.numeric(hedges_g_ci_lwr), 2)*-1)  # needs to be reverse scored
-  
-  hedges_g_ci_upr_by_participant <- data %>%
-    dplyr::group_by(Participant) %>%
-    do(hedges_g_ci_upr = bootES(.,
-                                R = n_boots,
-                                data.col = "Score",
-                                group.col = "Condition",
-                                contrast = c(A = 1, B = -1),
-                                effect.type = "hedges.g",
-                                ci.type = "bca",
-                                ci.conf = 0.95)$bounds[1]) %>%
-    ungroup() %>%
-    dplyr::mutate(hedges_g_ci_upr = round(as.numeric(hedges_g_ci_upr), 2)*-1)  # needs to be reverse scored
+    do(hedges_g_boot(data = .)) %>%
+    ungroup()
   
   # combine results
   results <- p_by_participant %>%
     left_join(median_change, by = "Participant") %>%
-    left_join(ruscios_A_by_participant, by = "Participant") %>%
     left_join(ruscios_A_boot_by_participant, by = "Participant") %>%
-    left_join(hedges_g_by_participant, by = "Participant") %>%
-    left_join(hedges_g_ci_lwr_by_participant, by = "Participant") %>%
-    left_join(hedges_g_ci_upr_by_participant, by = "Participant")
+    left_join(hedges_g_by_participant, by = "Participant")
   
   return(results)
 }

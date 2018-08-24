@@ -20,13 +20,14 @@ meta_analysis <- sced_meta_analysis(results = results)
 meta_analysis$meta_effect
 meta_analysis$meta_heterogeneity
 
-# Forest plot
-forest(meta_analysis$model_fit, 
-    xlab = "Odds ratio",    
-    digits = 2,
-    atransf = exp,  ## transf = exp ## also available
-    addcred = TRUE) 
-    ## add column headings to the plot
-    text(-6.3, 6.8, "Participant", pos = 4)
-    text( 8.4, 6.8, "Odds Ratio [95\% CI]", pos = 2)
+# forest plot
+forest(meta_analysis$model_fit,
+       xlab = "Ruscio's A",
+              digits = 2,
+              addcred = TRUE,
+              refline = 0.5)
+## add column headings to the plot
+text(-6.3, 6.8, "Participant", pos = 4)
+text( 8.4, 6.8, "Ruscio's A [95\% CI]", pos = 2)
+
 }

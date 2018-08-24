@@ -1,18 +1,20 @@
 ---
 title: "SCED"
-subtitle: "Vignette"
+subtitle: "Development of meta analysis function"
 author: "Ian Hussey"
 output:
   html_document:
-    df_print: paged
+    code_folding: hide
     highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
 ---
 
-```{r include=FALSE}
-
-knitr::opts_chunk$set(message = FALSE, 
-                      warning = FALSE)
-
+```{r, include=FALSE}
+knitr::opts_chunk$set(message=FALSE,
+                      warning=FALSE,
+                      cache.lazy=TRUE)
 ```
 
 ```{r}
@@ -35,82 +37,18 @@ library(timesavers)  # from github/ianhussey
 # disable scientific notation
 options(scipen = 999) 
 
-```
-
-# Simulate two participants
-
-```{r}
-
 # simulate data
-data <- simulate_data(participants = 2,    # two participants
+data <- simulate_data(participants = 8,    # two participants
                       timepoints_a = 10,   # 10 timepoints pre 
                       timepoints_b = 10,   # 10 post intervention
-                      cohens_d = 1) %>%  # Cohen's d = 1.5
+                      cohens_d = 1.5) %>%  # Cohen's d = 1.5
   mutate(Participant = paste("Participant", Participant))
-
-```
-
-```{r}
 
 # analyse
 results <- sced_analysis(data = data)
 
-```
-
-```{r}
-
-# sced_summary(results = results) %>%
-#   kable()
-
-results %>%
-  kable()
-
-```
-
-```{r fig.height=5, fig.width=5}
-
-# plot
-sced_plot(data = data)
-
-```
-
-# Use in-built dataset that's a little more complex
-
-```{r}
-
-# analyse
-results <- sced_analysis(data = simulated_data)
-
-```
-
-```{r}
-
-# # summarise results in a table
-# sced_summary(results = results) %>%
-#   kable()
-
-# summarise results in a table
-results %>%
-  kable()
-
-```
-
-
-```{r fig.height=10, fig.width=5}
-
-# plot
-sced_plot(data = simulated_data)
-
-```
-
-```{r}
-
 # meta analysis
 meta_analysis <- sced_meta_analysis(results = results)
-
-# return results
-meta_analysis$meta_effect
-meta_analysis$meta_heterogeneity
 
 # Forest plot
 forest(meta_analysis$model_fit,
@@ -127,5 +65,3 @@ text( 8.4, 6.8, "Ruscio's A [95% CI]", pos = 2)
 `r meta_analysis$meta_effect`
 
 `r meta_analysis$meta_heterogeneity`
-
-
