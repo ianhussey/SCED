@@ -2,19 +2,27 @@
 % Please edit documentation in R/meta_analysis.R
 \name{sced_meta_analysis}
 \alias{sced_meta_analysis}
-\title{Meta analyse probability values (Ruscio's A)}
+\title{Meta analyse standardized effect sizes across single cases}
 \usage{
-sced_meta_analysis(results)
+sced_meta_analysis(results, effect_size,
+  baseline_trend_exclusion_criterion = NULL)
 }
 \arguments{
 \item{results}{Output of sced_analysis().}
+
+\item{effect_size}{Which standardized effect size should be meta analysed. Must be set to either 'ruscios_A', 'A', 'hedges_g', or 'g'. Ruscio's A is more robust; Hedges' g is included for familiarity.}
+
+\item{baseline_trend_exclusion_criterion}{If set to a numeric value, cases with a baseline trend (ie standardized beta OLS regression value for the timepoint A scores) with an absolute value greater than this numeric value will be excluded from the meta analysis.}
 }
 \description{
-Meta analyse the robust effect sizes (Ruscio's A) provided by sced_analyse
+Meta analyse the standardized effect sizes (Ruscio's A or Hedges' g) provided by sced_analyse.
+Uses the metafor package under the hood. 
+Please note that the CIs reported in the meta analysis may differ from those reported by sced_analyse(), as the meta analysis uses the standard error for estimation rather than the empirical CIs, which can be asymmetric. When combined with the next point below, this means that the CIs in the meta analysis can be < 0 or > 1, outside the bounds of the observable values for Ruscio's A. If the meta analysed effect size intervals are < 0 or > 1 they can be reported as 0 or 1 instead.
+Meta analysis is done via a maximum likelihood random effects model using a gaussian link function for both Ruscio's A and Hedges' g effect sizes. In the case of Ruscio's A, this means that effect sizes are non parametric at the individual level, but the underlying effect is assumed to vary normally between participants. Other strategies for the meta analysis of probability are possible (e.g., some have employed logit link functions), but due to its relative rarity no best practices have yet emerged.
 }
 \examples{
 # meta analysis
-meta_analysis <- sced_meta_analysis(results = results)
+meta_analysis <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
 
 # return results
 meta_analysis$meta_effect

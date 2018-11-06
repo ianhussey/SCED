@@ -4,12 +4,20 @@
 \alias{sced_analysis}
 \title{Analyse data}
 \usage{
-sced_analysis(data, n_boots = 2000)
+sced_analysis(data, n_boots = 2000, invert_effect_sizes = FALSE)
 }
 \arguments{
 \item{data}{Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.}
+
+\item{n_boots:}{number of bootstrapped resamples for Hedges' g and Ruscio's A. N for p value permutation is n_boots*10.}
+
+\item{invert_effect_sizes:}{Effect sizes are reported assuming that scores in timepoint B are expected to be higher than timepoint A (i.e., that the intervention causes scores to increase). If invert_effect_sizes == TRUE then effect sizes are inverted, e.g., if the intervention is expected to causes scores to decrease.}
 }
 \value{
+Baseline trend: standardized beta OLS regression coefficient for the slope between the timepoint A data points. Treats the timepoints as equally spaced integers (e.g., rather than modelling them as dates). Can be used to exclude participants from consideration in meta analysis, e.g., on the basis that improvements at followup are due to improvement trends at baseline.
+
+Intervention trend: standardized beta OLS regression coefficient for the slope between the timepoint B data points. Treats the timepoints as equally spaced integers (e.g., rather than modelling them as dates).
+
 p: Hypothesis test p value via permutation test. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
 
 median_difference: Difference between the median value of A and the median value of B. Because Ruscio's A is non-parametric it can notionally suffer from ceiling effects, e.g., where A = 1.00 but the real difference between the groups are larger or smaller. It can therefore be useful to report the unstandardized effect size as well as the standardized effect sizes. Median difference is used here over mean difference given its greater robustness.
