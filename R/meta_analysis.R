@@ -94,7 +94,7 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
   # create results strings
   meta_effect_string <- 
     paste0("Meta analysis: k = ", meta_fit$k,  # number of single cases
-           "median (median difference between conditions) across cases = ", mdn_mdn_diff,  # median (median difference between conditions) across participants
+           ", unstandardized effect size (median median-difference) = ", mdn_mdn_diff, # median (median difference between conditions) across participants
            es_label_2, predictions$estimate[1],  # standardized ES
            ", 95% CI [", predictions$estimate[3], ", ", predictions$estimate[4], "]",  # 95% Confidence interval (long run contains mean standardized ES)
            ", 95% CR [", predictions$estimate[5], ", ", predictions$estimate[6], "]")  # 95% Credibility interval (long run contains observed standardized ES)
