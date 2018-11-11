@@ -16,6 +16,10 @@ forest_plot <- function(meta_analysis_results,
                         effect_size,
                         baseline_trend_exclusion_criterion = NULL) {
   
+  require(tidyverse)
+  require(brmstools)
+  require(patchwork)
+  
   # exclude participants due to baseline trends
   if (is.numeric(baseline_trend_exclusion_criterion)) {
     plotting_data <- meta_analysis_results$data %>%
@@ -48,13 +52,13 @@ forest_plot <- function(meta_analysis_results,
              size             = max(ruscios_A_se*100) - ruscios_A_se*100 + 1,
              ruscios_A_cr_lwr = ifelse(as.character(Participant) == "Meta analysis", CR_lwr, NA),
              ruscios_A_cr_upr = ifelse(as.character(Participant) == "Meta analysis", CR_upr, NA),
-             results_string   = paste0(format(round(ruscios_A, digits), nsmall = digits), " [",
-                                       format(round(ruscios_A_ci_lwr, digits), nsmall = digits), ", ",
-                                       format(round(ruscios_A_ci_upr, digits), nsmall = digits), "]"),
+             results_string   = paste0(format(round(ruscios_A, 2), nsmall = 2), " [",
+                                       format(round(ruscios_A_ci_lwr, 2), nsmall = 2), ", ",
+                                       format(round(ruscios_A_ci_upr, 2), nsmall = 2), "]"),
              results_string   = ifelse(as.character(Participant) == "Meta analysis", 
                                        paste0(results_string, "\n        [",
-                                              format(round(ruscios_A_cr_lwr, digits), nsmall = digits), ", ",
-                                              format(round(ruscios_A_cr_upr, digits), nsmall = digits), "]"),
+                                              format(round(ruscios_A_cr_lwr, 2), nsmall = 2), ", ",
+                                              format(round(ruscios_A_cr_upr, 2), nsmall = 2), "]"),
                                        results_string))
     
     p1 <- 
@@ -95,13 +99,13 @@ forest_plot <- function(meta_analysis_results,
              size             = max(hedges_g_se*10) - hedges_g_se*10 + 1,
              hedges_g_cr_lwr  = ifelse(as.character(Participant) == "Meta analysis", CR_lwr, NA),
              hedges_g_cr_upr  = ifelse(as.character(Participant) == "Meta analysis", CR_upr, NA),
-             results_string   = paste0(format(round(hedges_g, digits), nsmall = digits), " [",
-                                       format(round(hedges_g_ci_lwr, digits), nsmall = digits), ", ",
-                                       format(round(hedges_g_ci_upr, digits), nsmall = digits), "]"),
+             results_string   = paste0(format(round(hedges_g, 2), nsmall = 2), " [",
+                                       format(round(hedges_g_ci_lwr, 2), nsmall = 2), ", ",
+                                       format(round(hedges_g_ci_upr, 2), nsmall = 2), "]"),
              results_string   = ifelse(as.character(Participant) == "Meta analysis", 
                                        paste0(results_string, "\n        [",
-                                              format(round(hedges_g_cr_lwr, digits), nsmall = digits), ", ",
-                                              format(round(hedges_g_cr_upr, digits), nsmall = digits), "]"),
+                                              format(round(hedges_g_cr_lwr, 2), nsmall = 2), ", ",
+                                              format(round(hedges_g_cr_upr, 2), nsmall = 2), "]"),
                                        results_string))
     
     p1 <- 
