@@ -107,7 +107,8 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
            ", H^2 = ",   round(meta_fit$H2, 2))
   
   # returns list of results
-  return(list(median_median_difference_unstandardized_effect_size = mdn_mdn_diff,
+  return(list(data = results,
+              median_median_difference_unstandardized_effect_size = mdn_mdn_diff,
               model_fit = meta_fit,
               meta_analysed_standardized_effect_size = predictions,
               meta_effect = meta_effect_string,
