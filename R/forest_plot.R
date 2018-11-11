@@ -49,7 +49,8 @@ forest_plot <- function(meta_analysis_results,
                        ruscios_A_ci_lwr = meta_analysis_results$meta_analysed_standardized_effect_size$estimate[3],
                        ruscios_A_ci_upr = meta_analysis_results$meta_analysed_standardized_effect_size$estimate[4])) %>%
       mutate(Participant      = fct_rev(Participant),
-             size             = max(ruscios_A_se*100) - ruscios_A_se*100 + 1,
+             # set point size to proportionate range from 1-6
+             size             = 6 - (ruscios_A_se - min(ruscios_A_se)) / (max(ruscios_A_se) - min(ruscios_A_se)) * 5,
              ruscios_A_cr_lwr = ifelse(as.character(Participant) == "Meta analysis", CR_lwr, NA),
              ruscios_A_cr_upr = ifelse(as.character(Participant) == "Meta analysis", CR_upr, NA),
              results_string   = paste0(format(round(ruscios_A, 2), nsmall = 2), " [",
@@ -96,7 +97,8 @@ forest_plot <- function(meta_analysis_results,
                        hedges_g_ci_lwr = meta_analysis_results$meta_analysed_standardized_effect_size$estimate[3],
                        hedges_g_ci_upr = meta_analysis_results$meta_analysed_standardized_effect_size$estimate[4])) %>%
       mutate(Participant      = fct_rev(Participant),
-             size             = max(hedges_g_se*10) - hedges_g_se*10 + 1,
+             # set point size to proportionate range from 1-6
+             size             = 6 - (hedges_g_se - min(hedges_g_se)) / (max(hedges_g_se) - min(hedges_g_se)) * 5,
              hedges_g_cr_lwr  = ifelse(as.character(Participant) == "Meta analysis", CR_lwr, NA),
              hedges_g_cr_upr  = ifelse(as.character(Participant) == "Meta analysis", CR_upr, NA),
              results_string   = paste0(format(round(hedges_g, 2), nsmall = 2), " [",
