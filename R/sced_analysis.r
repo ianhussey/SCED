@@ -62,7 +62,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE) {
                                     data = .))) %>%
     ungroup() %>%
     dplyr::mutate(p = as.numeric(p),
-                  p = ifelse(p < .00001, "<.00001", round(p, 5)))
+                  p = ifelse(p < .00001, "<0.00001", format(round(p, 5), nsmall = 5)))
   
   median_change <- data %>%
     group_by(Participant) %>%
