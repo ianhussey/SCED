@@ -37,95 +37,55 @@ options(scipen = 999)
 
 ```
 
-# Simulate two participants
+# Participant level analyses
+
+Using built in dataset.
 
 ```{r}
 
-# simulate data
-data <- simulate_data(participants = 2,    # two participants
-                      timepoints_a = 10,   # 10 timepoints pre 
-                      timepoints_b = 10,   # 10 post intervention
-                      cohens_d = 1) %>%  # Cohen's d = 1.5
-  mutate(Participant = paste("Participant", Participant))
-
-```
-
-```{r}
-
-# analyse
-results <- sced_analysis(data = data)
-
-```
-
-```{r}
-
-# sced_summary(results = results) %>%
-#   kable()
-
-results %>%
-  kable()
-
-```
-
-```{r fig.height=5, fig.width=5}
-
-# plot
-sced_plot(data = data)
-
-```
-
-# Use in-built dataset that's a little more complex
-
-```{r}
-
-# analyse
 results <- sced_analysis(data = simulated_data)
 
-```
-
-```{r}
-
-# # summarise results in a table
-# sced_summary(results = results) %>%
-#   kable()
-
-# summarise results in a table
 results %>%
   kable()
 
 ```
 
+## Plot 
 
 ```{r fig.height=10, fig.width=5}
 
-# plot
 sced_plot(data = simulated_data)
 
 ```
 
+# Meta analysis
+
+You can optionally exclude participants from the meta analysis using the `baseline_trend_exclusion_criterion` parameter. You can change which effect size is meta analysed using the `effect_size` parameter.
+
 ```{r}
 
 # meta analysis
-meta_analysis <- sced_meta_analysis(results = results)
+meta_analysis <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
 
-# return results
-meta_analysis$meta_effect
-meta_analysis$meta_heterogeneity
-
-# Forest plot
-forest(meta_analysis$model_fit,
-       xlab = "Ruscio's A",
-       digits = 2,
-       addcred = TRUE,
-       refline = 0.5)
-## add column headings to the plot
-text(-6.3, 6.8, "Participant", pos = 4)
-text( 8.4, 6.8, "Ruscio's A [95% CI]", pos = 2)
+# forest plot
+forest_plot(meta_analysis, effect_size = "ruscios_A")
 
 ```
 
-`r meta_analysis$meta_effect`
+- `r meta_analysis$meta_effect`
+- `r meta_analysis$meta_heterogeneity`
 
-`r meta_analysis$meta_heterogeneity`
+# Simulate SCED data
 
+In order to learn to use the package without using the data you wish to ultimately analyse (which can be a source of unintentional p hacking), SCED data can easily be simulated using the `simulate_data` function. The number of participants, timepoints at A and B, and true effect size can be set to arbitrary values.
 
+```{r}
+
+# simulate data
+data <- simulate_data(participants = 2,     # two participants
+                      timepoints_a = 10,    # 10 timepoints pre 
+                      timepoints_b = 10,    # 10 post intervention
+                      cohens_d     = 2) %>% # Cohen's d = 2
+  mutate(Participant = paste("Participant", Participant))
+
+```
