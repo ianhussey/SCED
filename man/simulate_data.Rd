@@ -4,8 +4,8 @@
 \alias{simulate_data}
 \title{Simulate AB SCED data}
 \usage{
-simulate_data(participants = 10, timepoints_a = 15, timepoints_b = 15,
-  cohens_d = 1.5)
+simulate_data(participants = 10, timepoints_a = 15,
+  timepoints_b = 15, cohens_d = 1.5)
 }
 \arguments{
 \item{participants}{number of participants to simulate}

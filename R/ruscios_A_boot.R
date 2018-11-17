@@ -1,4 +1,4 @@
-#' Bootstrapped Ruscio's A with 95% CIs and standard error
+#' Bootstrapped Ruscio's A with 95 percent CIs and standard error
 #'
 #' This function bootstraps confidence intervals for Ruscio's A effect size (2008). 
 #' Code adapted from adapted from John Ruscio's original implementation of his metric: https://ruscio.pages.tcnj.edu/quantitative-methods-program-code/

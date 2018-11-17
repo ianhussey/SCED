@@ -2,10 +2,10 @@
 % Please edit documentation in R/ruscios_A_boot.R
 \name{ruscios_A_boot}
 \alias{ruscios_A_boot}
-\title{Bootstrapped Ruscio's A with 95% CIs and standard error}
+\title{Bootstrapped Ruscio's A with 95 percent CIs and standard error}
 \usage{
-ruscios_A_boot(data, variable, group, value1 = 1, value2 = 0, B = 2000,
-  Conf.Level = 0.95, seed = 1)
+ruscios_A_boot(data, variable, group, value1 = 1, value2 = 0,
+  B = 2000, Conf.Level = 0.95, seed = 1)
 }
 \arguments{
 \item{data}{data}
