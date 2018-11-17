@@ -1,11 +1,14 @@
 ---
-title: "SCED"
+title: "Single case experimental design & meta analysis using the SCED package"
 subtitle: "Vignette"
 author: "Ian Hussey"
 output:
   html_document:
-    df_print: paged
+    code_folding: hide
     highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
 ---
 
 ```{r include=FALSE}
@@ -20,6 +23,7 @@ knitr::opts_chunk$set(message = FALSE,
 # dependencies
 library(SCED)
 library(knitr)
+library(kableExtra)
 library(tidyverse)
 
 # dependencies required by SCED
@@ -39,18 +43,29 @@ options(scipen = 999)
 
 # Participant level analyses
 
-Using built in dataset.
+Using the package's built in dataset. A copy of this dataset is saved to the vignette folder, for those that want to know how data must be formatted to be analysed by this package.
+
+Robust hypothesis testing via permuted *p* values, and 95% CIs on robust unstandardized (median change) and standardized effect sizes (Non-overlap all pairs/Ruscio's A and Hedge's *g*).
+
+Baseline trends also identified using standardized beta regression coefficients.
 
 ```{r}
 
+# save copy
+write_csv(simulated_data, "example_data.csv")
+
+# analyse
 results <- sced_analysis(data = simulated_data)
 
 results %>%
-  kable()
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
 
 ```
 
 ## Plot 
+
+SCED plots with raw data, intervention point (vertical dotted line), median score within phases (horizontal dashed lines), and trends (regression lines).
 
 ```{r fig.height=10, fig.width=5}
 
@@ -59,6 +74,8 @@ sced_plot(data = simulated_data)
 ```
 
 # Meta analysis
+
+Random effects meta analysis of standardized effect sizes across participants, plotting a standard forest plot. Includes meta analysed effect sizes, 95% confidence intervals (estimates of true effect sizes), 95% credibility intervals (estimates of effect sizes likely to be observed in future participants), and heterogenity metrics (differences in effect between participants). 
 
 You can optionally exclude participants from the meta analysis using the `baseline_trend_exclusion_criterion` parameter. You can change which effect size is meta analysed using the `effect_size` parameter.
 
