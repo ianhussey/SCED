@@ -39,4 +39,5 @@ Code adapted from adapted from John Ruscio's original implementation of his metr
 }
 \examples{
 ruscios_A_boot(data = simulated_data, variable = "Score", group = "Condition", value1 = "B", value2 = "A")
+
 }

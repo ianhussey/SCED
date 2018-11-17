@@ -17,6 +17,7 @@
 #' @export
 #' @examples
 #' ruscios_A_boot(data = simulated_data, variable = "Score", group = "Condition", value1 = "B", value2 = "A")
+#' 
 
 ruscios_A_boot <- function(data, variable, group, value1 = 1, value2 = 0, 
                            B = 2000, Conf.Level = .95, seed = 1) {
