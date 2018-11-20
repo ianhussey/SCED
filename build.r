@@ -1,19 +1,19 @@
-# based on guide written by https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/
+# # based on guide written by https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/
 
 # # 1 dependencies
 # install.packages("devtools")
 # library("devtools")
 # devtools::install_github("klutometis/NLP")
 library(roxygen2)
-#
+
 # # 2 working directory
 setwd("~/git/")
-#
+
 # # 3 create minimum folders
 # devtools::create("NLP")
-#
-# 4 write functions and documentation using roxygen formatting
-# Use below template and put these functions into the R folder.
+
+# # 4 write functions and documentation using roxygen formatting
+# # Use below template and put these functions into the R folder.
 #' A Cat Function
 #'
 #' This function allows you to express your love of cats.
@@ -31,26 +31,27 @@ cat_function <- function(love=TRUE){
     print("I am not a cool person.")
   }
 }
-# 5 use roxygen to write the docs for the package
+
+# # 5 use roxygen to write the docs for the package
 
 library(devtools)
 setwd("~/git/SCED")
 document()
 
-# 6 install the package
+# # 6 install the package
 
 library(devtools)
 setwd("~/git/")
 install("SCED")
 
-# 7 place in a GitHub repo
+# # 7 place in a GitHub repo
 
-# 8 installation for users
+# # 8 installation for users
 
-# install packages (first time only)
+# # install packages (first time only)
 #install.packages("devtools")
 #library(devtools)
 #install_github("ianhussey/NLP")
-# load packages
+# # load packages
 library(devtools)
 library(SCED)

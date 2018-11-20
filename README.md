@@ -40,19 +40,11 @@ Calculates the following statistics:
 - Effect size *A* ([Ruscio, 2008](https://www.ncbi.nlm.nih.gov/pubmed/18331151)), a non-parametric, probabalistic effect size. Bootstrapping is used to calculated the median value and its 95% confidence intervals. This is also calculated via a permutation method, and is therefore robust/insensitive to outliers and distributions. The original, parametric versions of this test are referred to as the Area Under the Curve (AUC), the Common Language Effect Size (CLES), or the probability of superiority. *A* has an identical range (i.e. a probability between and 1) interpretation (i.e., the probability of a randomly selected time point in condition B being greater than a randomly selected time point in condition A). *A* is therefore also more robust than traditional effect size metrics for SCED such as the % overlap and the % greater than the median.
 - Hedges' *g* effect sizes, and its bootstrapped 95% confidence intervals. *g* is a variation of Cohen's *d* that is bias corrected for small sample sizes. It is included here for the sake of familiarity/comparison. However, it is sensitive to the ratio of data points in A vs. B, the normality of the distributions of data in each condition, and the equality of variances of A and B. Bootstrapped CIs serves to mitigate these assumptions somewhat.
 
-### sced_summary()
-
-Convert the output of `sced_analysis()` to a printable table.
-
-![plot](./screenshots/table.png)
-
 ### sced_meta_analysis()
 
-Conduct a random effects meta analysis of the robust standardized effect sizes (Ruscio's A values) from  `sced_analysis()`. Produces a meta analytic effect size, 95% confidence intervals, 95% credibility intervals (also referred to as prediction intervals), measures of heterogeneity between participants, and a forest plot of the effect sizes and meta analysed effect size. 
+Conduct a random effects meta analysis of the robust standardized effect sizes (Ruscio's A values) from `sced_analysis()`. Produces a meta analytic effect size, 95% confidence intervals, 95% credibility intervals (also referred to as prediction intervals), measures of heterogeneity between participants, and a forest plot of the effect sizes and meta analysed effect size. 
 
 ## To do
-
-- Change forest plot to display probability values (ie native Ruscio's A values) rather than odds ratios.
 
 - Change CIs in the meta analysis to using bootstrapping rather than Wald estimation
 
