@@ -63,7 +63,7 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
   
   data_for_meta_analysis <- results %>%
     dplyr::mutate(yi = yi,
-                  vi = vi)  # convert SE to variance
+                  vi = vi)  
   
   # robust unstandardized effect size: median (median difference between conditions)
   
@@ -72,7 +72,8 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
     pull(mdn_mdn_diff)
   
   # fit Random Effects model using metafor package
-  meta_fit <- rma(yi, vi,
+  meta_fit <- rma(yi = yi, 
+                  vi = vi,
                   data = data_for_meta_analysis,
                   slab = paste(Participant))
   
