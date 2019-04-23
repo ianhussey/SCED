@@ -4,6 +4,7 @@
 #' @param data Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.
 #' @param n_boots: number of bootstrapped resamples for Hedges' g and Ruscio's A. N for p value permutation is n_boots*10. 
 #' @param invert_effect_sizes: Effect sizes are reported assuming that scores in timepoint B are expected to be higher than timepoint A (i.e., that the intervention causes scores to increase). If invert_effect_sizes == TRUE then effect sizes are inverted, e.g., if the intervention is expected to causes scores to decrease.
+#' @param adjust_probability_ceiling: Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. Ie., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.  
 #' @return Baseline trend: standardized beta OLS regression coefficient for the slope between the timepoint A data points. Treats the timepoints as equally spaced integers (e.g., rather than modelling them as dates). Can be used to exclude participants from consideration in meta analysis, e.g., on the basis that improvements at followup are due to improvement trends at baseline.
 #' @return Intervention trend: standardized beta OLS regression coefficient for the slope between the timepoint B data points. Treats the timepoints as equally spaced integers (e.g., rather than modelling them as dates). 
 #' @return p: Hypothesis test p value via permutation test. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
@@ -12,9 +13,9 @@
 #' @return hedges_g: Effect size Hedge's g effect size via bootstrapping, a version of Cohen's d that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's d. Included here for familiarity: it's parametric assumtions (equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts. In order to relax the assumption of normality a bootstrapped implemenation is employed.
 #' @export
 #' @examples
-#' sced_results <- sced_analysis(data = simulated_data)
+#' sced_results <- sced_analysis(data = simulated_data, adjust_probability_ceiling = TRUE)
 
-sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE) {
+sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adjust_probability_ceiling = TRUE) {
   require(tidyverse)
   require(coin)
   require(effsize)
@@ -81,7 +82,8 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE) {
                       data = .,
                       value1 = "B",
                       value2 = "A",
-                      B = n_boots)) %>%
+                      B = n_boots,
+                      adjust_ceiling = adjust_probability_ceiling)) %>%
     ungroup()
 
   # bootstrapped Hedges' g effect size (removes assumption of normality but not equality of variances or equal N per condition)

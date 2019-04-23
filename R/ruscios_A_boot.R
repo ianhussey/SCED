@@ -10,6 +10,7 @@
 #' @param Conf.Level 1 - alpha value (e.g., .95).
 #' @param seed seed value for reproducability
 #' @param B Number of boostrapped resamples
+#' @param adjust_ceiling Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. Ie., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.
 #' @return ruscios_A_estimate Ruscio's A.
 #' @return ruscios_A_se Standard error of bootstrapped Ruscio's A values.
 #' @return ruscios_A_ci_lwr Lower 95% bootstrapped confidence interval via the BCA method
@@ -20,7 +21,8 @@
 #' 
 
 ruscios_A_boot <- function(data, variable, group, value1 = 1, value2 = 0, 
-                           B = 2000, Conf.Level = .95, seed = 1) {
+                           B = 2000, Conf.Level = .95, seed = 1,
+                           adjust_ceiling = FALSE) {
   
   # Fast calculation of the A statistic
   ruscios_A_function <- function(x, y) {
@@ -28,6 +30,13 @@ ruscios_A_boot <- function(data, variable, group, value1 = 1, value2 = 0,
     ny <- length(y)
     rx <- sum(rank(c(x, y))[1:nx])
     A = (rx / nx - (nx + 1) / 2) / ny
+    # if adjust_ceiling == TRUE & A == 0 or 1, rescore it as if a single data point was inferior to a single second data point between conditions. 
+    # Ie., use the lowest granularity allowed by the data for rescoring. More data points will result in a higher adjusted A.
+    if(adjust_ceiling == TRUE & A == 1){
+      A <- ruscios_A_function(c(rep(4, length(x)), 2), c(rep(1, length(y)), 3))
+    } else if(adjust_ceiling == TRUE & A == 0){
+      A <- 1 - ruscios_A_function(c(rep(4, length(x)), 2), c(rep(1, length(y)), 3))
+    }
     return(A)
   }
   

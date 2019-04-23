@@ -4,7 +4,8 @@
 \alias{sced_analysis}
 \title{Analyse data}
 \usage{
-sced_analysis(data, n_boots = 2000, invert_effect_sizes = FALSE)
+sced_analysis(data, n_boots = 2000, invert_effect_sizes = FALSE,
+  adjust_probability_ceiling = TRUE)
 }
 \arguments{
 \item{data}{Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.}
@@ -12,6 +13,8 @@ sced_analysis(data, n_boots = 2000, invert_effect_sizes = FALSE)
 \item{n_boots:}{number of bootstrapped resamples for Hedges' g and Ruscio's A. N for p value permutation is n_boots*10.}
 
 \item{invert_effect_sizes:}{Effect sizes are reported assuming that scores in timepoint B are expected to be higher than timepoint A (i.e., that the intervention causes scores to increase). If invert_effect_sizes == TRUE then effect sizes are inverted, e.g., if the intervention is expected to causes scores to decrease.}
+
+\item{adjust_probability_ceiling:}{Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. Ie., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.}
 }
 \value{
 Baseline trend: standardized beta OLS regression coefficient for the slope between the timepoint A data points. Treats the timepoints as equally spaced integers (e.g., rather than modelling them as dates). Can be used to exclude participants from consideration in meta analysis, e.g., on the basis that improvements at followup are due to improvement trends at baseline.
@@ -30,5 +33,5 @@ hedges_g: Effect size Hedge's g effect size via bootstrapping, a version of Cohe
 Analyse data from an AB design SCED experiment using non-parametric frequentist tests
 }
 \examples{
-sced_results <- sced_analysis(data = simulated_data)
+sced_results <- sced_analysis(data = simulated_data, adjust_probability_ceiling = TRUE)
 }

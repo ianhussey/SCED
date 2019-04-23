@@ -5,7 +5,7 @@
 \title{Bootstrapped Ruscio's A with 95 percent CIs and standard error}
 \usage{
 ruscios_A_boot(data, variable, group, value1 = 1, value2 = 0,
-  B = 2000, Conf.Level = 0.95, seed = 1)
+  B = 2000, Conf.Level = 0.95, seed = 1, adjust_ceiling = FALSE)
 }
 \arguments{
 \item{data}{data}
@@ -23,6 +23,8 @@ ruscios_A_boot(data, variable, group, value1 = 1, value2 = 0,
 \item{Conf.Level}{1 - alpha value (e.g., .95).}
 
 \item{seed}{seed value for reproducability}
+
+\item{adjust_ceiling}{Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. Ie., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.}
 }
 \value{
 ruscios_A_estimate Ruscio's A.
