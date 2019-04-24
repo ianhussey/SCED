@@ -33,5 +33,5 @@ hedges_g: Effect size Hedge's g effect size via bootstrapping, a version of Cohe
 Analyse data from an AB design SCED experiment using non-parametric frequentist tests
 }
 \examples{
-sced_results <- sced_analysis(data = simulated_data, adjust_probability_ceiling = TRUE)
+sced_results <- sced_analysis(data = simulated_data)
 }

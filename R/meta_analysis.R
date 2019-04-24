@@ -13,24 +13,20 @@
 #' meta_analysis <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
 #' 
 #' # return results
-#' meta_analysis$meta_effect
+#' meta_analysis$meta_effect_size
 #' meta_analysis$meta_heterogeneity
 #' 
 #' # forest plot
 #' forest(meta_analysis$model_fit,
-#'        xlab = "Ruscio's A",
-#'               digits = 2,
-#'               addcred = TRUE,
-#'               refline = 0.5)
-#' ## add column headings to the plot
-#' text(-6.3, 6.8, "Participant", pos = 4)
-#' text( 8.4, 6.8, "Ruscio's A [95% CI]", pos = 2)
+#'        xlab = "Probability of superiority (Ruscio's A)",
+#'        digits = 2,
+#'        addcred = TRUE,
+#'        refline = 0.5)
 #' 
 
 sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_criterion = NULL) {
   require(tidyverse)
   require(metafor)
-  require(timesavers)
   
   # exclude participants due to baseline trends
   if (is.numeric(baseline_trend_exclusion_criterion)) {
@@ -43,11 +39,20 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
   # get data
   if (effect_size %in% c("ruscios_A", "A")) {
     
-    yi <- results$ruscios_A
-    vi <- results$ruscios_A_se^2
+    # convert OR CIs to log OR SE http://www.metafor-project.org/doku.php/tips:assembling_data_or
+    results_temp <- results %>%
+      dplyr::mutate(log_OR = log(ruscios_A / (1 - ruscios_A)),
+                    OR_lwr = ruscios_A_ci_lwr / (1 - ruscios_A_ci_lwr),
+                    OR_upr = ruscios_A_ci_upr / (1 - ruscios_A_ci_upr),
+                    log_OR_se = (log(OR_lwr) - log(OR_upr)) / (2*1.96))
     
-    es_label <- "Meta analysed Ruscio's A"
-    es_label_2 <- ", Ruscio's A = "
+    yi <- results_temp %>%
+      pull(log_OR)
+    
+    vi <- results_temp %>%
+      pull(log_OR_se)
+    
+    es_label <- "Meta analysed Generalized Odds Ratio"
     
   } else if (effect_size %in% c("hedges_g", "g")) {
     
@@ -68,7 +73,7 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
   # robust unstandardized effect size: median (median difference between conditions)
   
   mdn_mdn_diff <- results %>%
-    summarize(mdn_mdn_diff = median(median_difference)) %>%
+    dplyr::summarize(mdn_mdn_diff = median(median_difference)) %>%
     pull(mdn_mdn_diff)
   
   # fit Random Effects model using metafor package
@@ -92,17 +97,51 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
                                   "cr.lb" = "95% CR lower",
                                   "cr.ub" = "95% CR upper"))
   
+  
+  if (effect_size %in% c("ruscios_A", "A")) {
+    # exponentiate the log odds to get odds ratios
+    predictions <- predictions %>%
+      dplyr::mutate(estimate = exp(estimate))
+    
+    # convert generalized odds ratios to probabilities
+    predictions_as_probabilities <- predictions %>%
+      dplyr::mutate(estimate = estimate/(1 + estimate),
+             metric = str_replace(metric, "Generalized Odds Ratio", "Ruscio's A")) %>%
+      round_df(3) %>%
+      filter(metric != "se")
+    
+    # only round odds ratios after probabilities have been calculated to prevent information loss
+    predictions <- round_df(predictions, 2)
+    
+  } else {
+    predictions_as_probabilities <- NULL
+  }
+  
   # create results strings
-  meta_effect_string <- 
-    paste0("Meta analysis: N = ", meta_fit$k,  # number of single cases
-           ", unstandardized effect size (median median-difference) = ", mdn_mdn_diff, # median (median difference between conditions) across participants
-           es_label_2, predictions$estimate[1],  # standardized ES
-           ", 95% CI [", predictions$estimate[3], ", ", predictions$estimate[4], "]",  # 95% Confidence interval (long run contains mean standardized ES)
-           ", 95% CR [", predictions$estimate[5], ", ", predictions$estimate[6], "]")  # 95% Credibility interval (long run contains observed standardized ES)
+  if (effect_size %in% c("ruscios_A", "A")) {
+    meta_effect_string <- 
+      paste0("Meta analysis: N = ", meta_fit$k,  # number of single cases
+             ", unstandardized effect size (median median-difference) = ", mdn_mdn_diff, # median (median difference between conditions) across participants
+             ", Ruscio's A = ", predictions_as_probabilities$estimate[1],  # standardized ES
+             ", 95% CI [", predictions_as_probabilities$estimate[2], ", ", predictions_as_probabilities$estimate[3], "]",  # 95% Confidence interval (long run contains mean standardized ES)
+             ", 95% CR [", predictions_as_probabilities$estimate[4], ", ", predictions_as_probabilities$estimate[5], "]",  # 95% Credibility interval (long run contains observed standardized ES)
+             ", Generalized OR = ", predictions$estimate[1],  # standardized ES
+             ", 95% CI [", predictions$estimate[3], ", ", predictions$estimate[4], "]",  # 95% Confidence interval (long run contains mean standardized ES)
+             ", 95% CR [", predictions$estimate[5], ", ", predictions$estimate[6], "]",  # 95% Credibility interval (long run contains observed standardized ES)
+             ", p ", format_pval_better(meta_fit$pval))
+  } else {
+    meta_effect_string <- 
+      paste0("Meta analysis: N = ", meta_fit$k,  # number of single cases
+             ", unstandardized effect size (median median-difference) = ", mdn_mdn_diff, # median (median difference between conditions) across participants
+             es_label_2, predictions$estimate[1],  # standardized ES
+             ", 95% CI [", predictions$estimate[3], ", ", predictions$estimate[4], "]",  # 95% Confidence interval (long run contains mean standardized ES)
+             ", 95% CR [", predictions$estimate[5], ", ", predictions$estimate[6], "]",  # 95% Credibility interval (long run contains observed standardized ES)
+             ", p ", format_pval_better(meta_fit$pval))
+  }
   
   meta_heterogeneity_string <- 
     paste0("Heterogeneity tests: Q(df = ", meta_fit$k - 1, ") = ", round(meta_fit$QE, 2), 
-           ", p = ", ifelse(meta_fit$pval < 0.001, "< .001", as.character(round(meta_fit$pval, 3))),
+           ", p ",     format_pval_better(meta_fit$QEp),
            ", tau^2 = ", round(meta_fit$tau2, 2), 
            ", I^2 = ",   round(meta_fit$I2, 2),
            ", H^2 = ",   round(meta_fit$H2, 2))
@@ -112,7 +151,8 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
               median_median_difference_unstandardized_effect_size = mdn_mdn_diff,
               model_fit = meta_fit,
               meta_analysed_standardized_effect_size = predictions,
-              meta_effect = meta_effect_string,
+              meta_analysed_standardized_effect_size_as_probability = predictions_as_probabilities,
+              meta_effect_size = meta_effect_string,
               meta_heterogeneity = meta_heterogeneity_string))
   
 }

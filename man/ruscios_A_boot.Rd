@@ -5,7 +5,7 @@
 \title{Bootstrapped Ruscio's A with 95 percent CIs and standard error}
 \usage{
 ruscios_A_boot(data, variable, group, value1 = 1, value2 = 0,
-  B = 2000, Conf.Level = 0.95, seed = 1, adjust_ceiling = FALSE)
+  B = 2000, Conf.Level = 0.95, seed = 1, adjust_ceiling = TRUE)
 }
 \arguments{
 \item{data}{data}

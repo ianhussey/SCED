@@ -22,7 +22,7 @@
 
 ruscios_A_boot <- function(data, variable, group, value1 = 1, value2 = 0, 
                            B = 2000, Conf.Level = .95, seed = 1,
-                           adjust_ceiling = FALSE) {
+                           adjust_ceiling = TRUE) {
   
   # Fast calculation of the A statistic
   ruscios_A_function <- function(x, y) {

@@ -13,7 +13,7 @@
 #' @return hedges_g: Effect size Hedge's g effect size via bootstrapping, a version of Cohen's d that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's d. Included here for familiarity: it's parametric assumtions (equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts. In order to relax the assumption of normality a bootstrapped implemenation is employed.
 #' @export
 #' @examples
-#' sced_results <- sced_analysis(data = simulated_data, adjust_probability_ceiling = TRUE)
+#' sced_results <- sced_analysis(data = simulated_data)
 
 sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adjust_probability_ceiling = TRUE) {
   require(tidyverse)
@@ -63,7 +63,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
                                     data = .))) %>%
     ungroup() %>%
     dplyr::mutate(p = as.numeric(p),
-                  p = ifelse(p < .00001, "<0.00001", format(round(p, 5), nsmall = 5)))
+                  p = format_pval_better(p))
   
   median_change <- data %>%
     group_by(Participant) %>%

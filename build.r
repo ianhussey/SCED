@@ -44,7 +44,7 @@ library(devtools)
 setwd("~/git/")
 install("SCED")
 
-# # 7 place in a GitHub repo
+ # # 7 place in a GitHub repo
 
 # # 8 installation for users
 

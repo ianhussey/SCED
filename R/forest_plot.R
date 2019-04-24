@@ -28,26 +28,26 @@ forest_plot <- function(meta_analysis_results,
     plotting_data <- meta_analysis_results$data
   }
   
-  # credibility intervals
-  CR_lwr <- meta_analysis_results$meta_analysed_standardized_effect_size %>%
-    filter(metric == "95% CR lower") %>%
-    pull(estimate)
-  
-  CR_upr <- meta_analysis_results$meta_analysed_standardized_effect_size %>%
-    filter(metric == "95% CR upper") %>%
-    pull(estimate)
-  
-  
   # produce plot for appropriate effect size stat
   if (effect_size %in% c("ruscios_A", "A")) {
+    
+    # credibility intervals
+    CR_lwr <- meta_analysis_results$meta_analysed_standardized_effect_size_as_probability %>%
+      filter(metric == "95% CR lower") %>%
+      pull(estimate)
+    
+    CR_upr <- meta_analysis_results$meta_analysed_standardized_effect_size_as_probability %>%
+      filter(metric == "95% CR upper") %>%
+      pull(estimate)
     
     combined_plotting_data <- meta_analysis_results$data %>%
       select(Participant, ruscios_A, ruscios_A_se, ruscios_A_ci_lwr, ruscios_A_ci_upr) %>%
       rbind(data.frame(Participant      = "Meta analysis",
-                       ruscios_A        = meta_analysis_results$meta_analysed_standardized_effect_size$estimate[1],
-                       ruscios_A_se     = meta_analysis_results$meta_analysed_standardized_effect_size$estimate[2],
-                       ruscios_A_ci_lwr = meta_analysis_results$meta_analysed_standardized_effect_size$estimate[3],
-                       ruscios_A_ci_upr = meta_analysis_results$meta_analysed_standardized_effect_size$estimate[4])) %>%
+                       ruscios_A        = meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[1],
+                       ruscios_A_se     = (meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[3] - 
+                                             meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[2]) / (2*1.96),
+                       ruscios_A_ci_lwr = meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[2],
+                       ruscios_A_ci_upr = meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[3])) %>%
       mutate(Participant      = fct_rev(Participant),
              # set point size to proportionate range from 1-6
              size             = 6 - (ruscios_A_se - min(ruscios_A_se)) / (max(ruscios_A_se) - min(ruscios_A_se)) * 5,
@@ -88,6 +88,15 @@ forest_plot <- function(meta_analysis_results,
     return(plot)
     
   } else if (effect_size %in% c("hedges_g", "g")) {
+    
+    # credibility intervals
+    CR_lwr <- meta_analysis_results$meta_analysed_standardized_effect_size %>%
+      filter(metric == "95% CR lower") %>%
+      pull(estimate)
+    
+    CR_upr <- meta_analysis_results$meta_analysed_standardized_effect_size %>%
+      filter(metric == "95% CR upper") %>%
+      pull(estimate)
     
     combined_plotting_data <- meta_analysis_results$data %>%
       select(Participant, hedges_g, hedges_g_se, hedges_g_ci_lwr, hedges_g_ci_upr) %>%

@@ -11,21 +11,21 @@ sced_plot <- function(data) {
   require(forcats)
   
   data_with_condition_change <- data %>% 
-    group_by(Participant) %>% 
+    dplyr::group_by(Participant) %>% 
     dplyr::summarize(condition_change = max(Timepoint[Condition == "A"]) + 0.5) %>% 
-    right_join(data, by = "Participant") %>% 
-    group_by(Participant, Condition) %>% mutate(median_score = median(Score)) %>% 
-    ungroup()
+    dplyr::right_join(data, by = "Participant") %>% 
+    dplyr::group_by(Participant, Condition) %>% mutate(median_score = median(Score)) %>% 
+    dplyr::ungroup()
   
   intervention_point <- data %>% 
-    filter(Condition == "B") %>% 
-    group_by(Participant) %>% 
-    summarize(intervention_point = min(Timepoint)) %>% 
-    ungroup()
+    dplyr::filter(Condition == "B") %>% 
+    dplyr::group_by(Participant) %>% 
+    dplyr::summarize(intervention_point = min(Timepoint)) %>% 
+    dplyr::ungroup()
   
   plot_data <- data_with_condition_change %>% 
-    left_join(intervention_point, by = "Participant") %>% 
-    mutate(Participant = as.factor(Participant)) %>%
+    dplyr::left_join(intervention_point, by = "Participant") %>% 
+    dplyr::mutate(Participant = as.factor(Participant)) %>%
     dplyr::mutate(Participant = forcats::fct_reorder(Participant, intervention_point))
   
   plot <- ggplot(plot_data) + 
