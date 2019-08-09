@@ -3,6 +3,7 @@
 export(forest_plot)
 export(format_pval_better)
 export(round_df)
+export(ruscios_A)
 export(ruscios_A_boot)
 export(sced_analysis)
 export(sced_meta_analysis)

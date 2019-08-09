@@ -4,7 +4,7 @@
 \alias{forest_plot}
 \title{Create forest plot from meta analysis results}
 \usage{
-forest_plot(meta_analysis_results, effect_size,
+forest_plot(meta_analysis_results, effect_size = "rucsios_A",
   baseline_trend_exclusion_criterion = NULL)
 }
 \arguments{
@@ -17,7 +17,7 @@ Meta analyse the standardized effect sizes (Ruscio's A or Hedges' g) provided by
 }
 \examples{
 # meta analysis
-meta_analysis <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
+meta_analysis <- sced_meta_analysis(results = sced_results, effect_size = "ruscios_A")
 
 # forest plot
 forest_plot(meta_analysis)
