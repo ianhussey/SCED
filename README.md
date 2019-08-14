@@ -44,7 +44,13 @@ Calculates the following statistics:
 
 Conduct a random effects meta analysis of the robust standardized effect sizes (Ruscio's A values) from `sced_analysis()`. Produces a meta analytic effect size, 95% confidence intervals, 95% credibility intervals (also referred to as prediction intervals), measures of heterogeneity between participants, and a forest plot of the effect sizes and meta analysed effect size. 
 
+### power_meta()
+
+Rough *a priori* power analysis for SCED's between subjects meta analysis based on the equations derived from Valentine et al (2009) by Quintana ([2017](https://towardsdatascience.com/how-to-calculate-statistical-power-for-your-meta-analysis-e108ee586ae8)). Some approximations are made: e.g., Valentine et al assume a between groups design and the use of Cohen's *d* over the SCED package's Hedge's *g*. The function therefore likely underestimates power somewhat. Note that power analysis should not be used in isolation to determine sample size: number of participants, timepoints, etc should also take methodological recommendations for SCEDs into account. 
+
 ## To do
+
+- Add a Ruscio's A conversion to the meta analysis function.
 
 - Change CIs in the meta analysis to using bootstrapping rather than Wald estimation
 
@@ -57,4 +63,4 @@ Conduct a random effects meta analysis of the robust standardized effect sizes (
 
 - Add additional other terminology for *A* from Parker (2009). 
 
-  ​
+  
