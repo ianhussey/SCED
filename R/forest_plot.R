@@ -33,34 +33,34 @@ forest_plot <- function(meta_analysis_results,
     
     # credibility intervals
     CR_lwr <- meta_analysis_results$meta_analysed_standardized_effect_size_as_probability %>%
-      filter(metric == "95% CR lower") %>%
-      pull(estimate)
+      dplyr::filter(metric == "95% CR lower") %>%
+      dplyr::pull(estimate)
     
     CR_upr <- meta_analysis_results$meta_analysed_standardized_effect_size_as_probability %>%
-      filter(metric == "95% CR upper") %>%
-      pull(estimate)
+      dplyr::filter(metric == "95% CR upper") %>%
+      dplyr::pull(estimate)
     
     combined_plotting_data <- meta_analysis_results$data %>%
-      select(Participant, ruscios_A, ruscios_A_se, ruscios_A_ci_lwr, ruscios_A_ci_upr) %>%
+      dplyr::select(Participant, ruscios_A, ruscios_A_se, ruscios_A_ci_lwr, ruscios_A_ci_upr) %>%
       rbind(data.frame(Participant      = "Meta analysis",
                        ruscios_A        = meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[1],
                        ruscios_A_se     = (meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[3] - 
                                              meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[2]) / (2*1.96),
                        ruscios_A_ci_lwr = meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[2],
                        ruscios_A_ci_upr = meta_analysis_results$meta_analysed_standardized_effect_size_as_probability$estimate[3])) %>%
-      mutate(Participant      = fct_rev(Participant),
-             # set point size to proportionate range from 1-6
-             size             = 6 - (ruscios_A_se - min(ruscios_A_se)) / (max(ruscios_A_se) - min(ruscios_A_se)) * 5,
-             ruscios_A_cr_lwr = ifelse(as.character(Participant) == "Meta analysis", CR_lwr, NA),
-             ruscios_A_cr_upr = ifelse(as.character(Participant) == "Meta analysis", CR_upr, NA),
-             results_string   = paste0(format(round(ruscios_A, 2), nsmall = 2), " [",
-                                       format(round(ruscios_A_ci_lwr, 2), nsmall = 2), ", ",
-                                       format(round(ruscios_A_ci_upr, 2), nsmall = 2), "]"),
-             results_string   = ifelse(as.character(Participant) == "Meta analysis", 
-                                       paste0(results_string, "\n        [",
-                                              format(round(ruscios_A_cr_lwr, 2), nsmall = 2), ", ",
-                                              format(round(ruscios_A_cr_upr, 2), nsmall = 2), "]"),
-                                       results_string))
+      dplyr::mutate(Participant      = fct_rev(Participant),
+                    # set point size to proportionate range from 1-6
+                    size             = 6 - (ruscios_A_se - min(ruscios_A_se)) / (max(ruscios_A_se) - min(ruscios_A_se)) * 5,
+                    ruscios_A_cr_lwr = ifelse(as.character(Participant) == "Meta analysis", CR_lwr, NA),
+                    ruscios_A_cr_upr = ifelse(as.character(Participant) == "Meta analysis", CR_upr, NA),
+                    results_string   = paste0(format(round(ruscios_A, 2), nsmall = 2), " [",
+                                              format(round(ruscios_A_ci_lwr, 2), nsmall = 2), ", ",
+                                              format(round(ruscios_A_ci_upr, 2), nsmall = 2), "]"),
+                    results_string   = ifelse(as.character(Participant) == "Meta analysis", 
+                                              paste0(results_string, "\n        [",
+                                                     format(round(ruscios_A_cr_lwr, 2), nsmall = 2), ", ",
+                                                     format(round(ruscios_A_cr_upr, 2), nsmall = 2), "]"),
+                                              results_string))
     
     p1 <- 
       ggplot(combined_plotting_data, aes(Participant, ruscios_A)) +
@@ -146,7 +146,7 @@ forest_plot <- function(meta_analysis_results,
   } else {
     print("effect_size must be set to 'ruscios_A', 'A', 'hedges_g', or 'g'")
   }
-
+  
 }
 
 

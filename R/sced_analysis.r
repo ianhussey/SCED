@@ -16,44 +16,47 @@
 #' sced_results <- sced_analysis(data = simulated_data)
 
 sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adjust_probability_ceiling = TRUE) {
+  
   require(tidyverse)
+  require(broom)
   require(coin)
   require(effsize)
   require(bootES)
+  
   data(simulated_data)
   
   # trends at baseline and post intervention
   baseline_trend <- data %>%
-    filter(Condition == "A") %>%
+    dplyr::filter(Condition == "A") %>%
     # standardize data
-    mutate(standardized_score = as.numeric(scale(Score))) %>%
+    dplyr::mutate(standardized_score = as.numeric(scale(Score))) %>%
     # fit linear model for each participant
-    group_by(Participant) %>%
-    mutate(timepoint_integer          = row_number(),
-           timepoint_integer_centered = as.numeric(scale(timepoint_integer))) %>%
+    dplyr::group_by(Participant) %>%
+    dplyr::mutate(timepoint_integer          = row_number(),
+                  timepoint_integer_centered = as.numeric(scale(timepoint_integer))) %>%
     do(tidy(lm(standardized_score ~ timepoint_integer_centered, data = .))) %>%
-    ungroup() %>%
+    dplyr::ungroup() %>%
     # extract standardized beta estimates
-    filter(term == "timepoint_integer_centered") %>%
+    dplyr::filter(term == "timepoint_integer_centered") %>%
     # tidy names
-    mutate(`Baseline trend`    = round(estimate, 2)) %>%
-    select(Participant, `Baseline trend`)
+    dplyr::mutate(`Baseline trend`    = round(estimate, 2)) %>%
+    dplyr::select(Participant, `Baseline trend`)
   
   post_intervention_trend <- data %>%
-    filter(Condition == "B") %>%
+    dplyr::filter(Condition == "B") %>%
     # standardize data
-    mutate(standardized_score = as.numeric(scale(Score))) %>%
+    dplyr::mutate(standardized_score = as.numeric(scale(Score))) %>%
     # fit linear model for each participant
-    group_by(Participant) %>%
-    mutate(timepoint_integer = row_number(),
-           timepoint_integer_centered = as.numeric(scale(timepoint_integer))) %>%
+    dplyr::group_by(Participant) %>%
+    dplyr::mutate(timepoint_integer = row_number(),
+                  timepoint_integer_centered = as.numeric(scale(timepoint_integer))) %>%
     do(tidy(lm(standardized_score ~ timepoint_integer_centered, data = .))) %>%
-    ungroup() %>%
+    dplyr::ungroup() %>%
     # extract standardized beta estimates
-    filter(term == "timepoint_integer_centered") %>%
+    dplyr::filter(term == "timepoint_integer_centered") %>%
     # tidy names
-    mutate(`Intervention trend` = round(estimate, 2)) %>%
-    select(Participant, `Intervention trend`)
+    dplyr::mutate(`Intervention trend` = round(estimate, 2)) %>%
+    dplyr::select(Participant, `Intervention trend`)
   
   # p values via non-parametric permutation tests
   p_by_participant <- data %>%
@@ -61,12 +64,12 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     do(p = pvalue(independence_test(Score ~ as.factor(Condition),
                                     distribution = approximate(B = n_boots*10), # needs more than other tests
                                     data = .))) %>%
-    ungroup() %>%
+    dplyr::ungroup() %>%
     dplyr::mutate(p = as.numeric(p),
                   p = format_pval_better(p))
   
   median_change <- data %>%
-    group_by(Participant) %>%
+    dplyr::group_by(Participant) %>%
     dplyr::summarize(median_a          = median(Score[Condition == "A"]),
                      median_b          = median(Score[Condition == "B"]),
                      median_difference = median_b - median_a,
@@ -76,7 +79,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   # bootstrapped Ruscio's nonparametric effect size A
   # function defined elsewhere in this package
   ruscios_A_boot_by_participant <- data %>%
-    group_by(Participant) %>%
+    dplyr::group_by(Participant) %>%
     do(ruscios_A_boot(variable = "Score",
                       group = "Condition",
                       data = .,
@@ -84,22 +87,22 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
                       value2 = "A",
                       B = n_boots,
                       adjust_ceiling = adjust_probability_ceiling)) %>%
-    ungroup()
-
+    dplyr::ungroup()
+  
   # bootstrapped Hedges' g effect size (removes assumption of normality but not equality of variances or equal N per condition)
   hedges_g_boot <- function(data) {
     require(bootES)
     require(tidyverse)
     
     fit <- data %>%
-      bootES(.,
-             R           = n_boots,
-             data.col    = "Score",
-             group.col   = "Condition",
-             contrast    = c(A = -1, B = 1),
-             effect.type = "hedges.g",
-             ci.type     = "bca",
-             ci.conf     = 0.95)
+      bootES::bootES(.,
+                     R           = n_boots,
+                     data.col    = "Score",
+                     group.col   = "Condition",
+                     contrast    = c(A = -1, B = 1),
+                     effect.type = "hedges.g",
+                     ci.type     = "bca",
+                     ci.conf     = 0.95)
     
     results <- data.frame(hedges_g        = round(fit$t0,        3),
                           hedges_g_se     = round(sd(fit$t),     3),
@@ -108,27 +111,27 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   }
   
   hedges_g_by_participant <- data %>%
-    group_by(Participant) %>%
+    dplyr::group_by(Participant) %>%
     do(hedges_g_boot(data = .)) %>%
-    ungroup()
+    dplyr::ungroup()
   
   # combine results
   results <- baseline_trend %>%
-    left_join(post_intervention_trend,       by = "Participant") %>%
-    left_join(p_by_participant,              by = "Participant") %>%
-    left_join(median_change,                 by = "Participant") %>%
-    left_join(ruscios_A_boot_by_participant, by = "Participant") %>%
-    left_join(hedges_g_by_participant,       by = "Participant")
-    
+    dplyr::left_join(post_intervention_trend,       by = "Participant") %>%
+    dplyr::left_join(p_by_participant,              by = "Participant") %>%
+    dplyr::left_join(median_change,                 by = "Participant") %>%
+    dplyr::left_join(ruscios_A_boot_by_participant, by = "Participant") %>%
+    dplyr::left_join(hedges_g_by_participant,       by = "Participant")
+  
   # conditionally invert effect sizes results
   if (invert_effect_sizes == TRUE){
     results <- results %>%
-      mutate(ruscios_A = 1 - ruscios_A,
-             ruscios_A_ci_lwr = 1 - ruscios_A_ci_lwr,
-             ruscios_A_ci_upr = 1 - ruscios_A_ci_upr,
-             hedges_g = hedges_g*-1,
-             hedges_g_ci_lwr = hedges_g_ci_lwr*-1,
-             hedges_g_ci_upr = hedges_g_ci_upr*-1)
+      dplyr::mutate(ruscios_A = 1 - ruscios_A,
+                    ruscios_A_ci_lwr = 1 - ruscios_A_ci_lwr,
+                    ruscios_A_ci_upr = 1 - ruscios_A_ci_upr,
+                    hedges_g = hedges_g*-1,
+                    hedges_g_ci_lwr = hedges_g_ci_lwr*-1,
+                    hedges_g_ci_upr = hedges_g_ci_upr*-1)
   }  
   
   return(results)

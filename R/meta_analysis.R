@@ -32,7 +32,7 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
   if (is.numeric(baseline_trend_exclusion_criterion)) {
     
     results <- results %>%
-      filter(abs(`Baseline trend`) <= baseline_trend_exclusion_criterion)
+      dplyr::filter(abs(`Baseline trend`) <= baseline_trend_exclusion_criterion)
     
   }
   
@@ -47,10 +47,10 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
                     log_OR_se = (log(OR_lwr) - log(OR_upr)) / (2*1.96))
     
     yi <- results_temp %>%
-      pull(log_OR)
+      dplyr::pull(log_OR)
     
     vi <- results_temp %>%
-      pull(log_OR_se)
+      dplyr::pull(log_OR_se)
     
     es_label <- "Meta analysed Generalized Odds Ratio"
     
@@ -74,7 +74,7 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
   
   mdn_mdn_diff <- results %>%
     dplyr::summarize(mdn_mdn_diff = median(median_difference)) %>%
-    pull(mdn_mdn_diff)
+    dplyr::pull(mdn_mdn_diff)
   
   # fit Random Effects model using metafor package
   meta_fit <- rma(yi = yi, 
@@ -86,16 +86,16 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
   predictions <-
     predict(meta_fit) %>%
     as.data.frame() %>%
-    gather() %>%
+    dplyr::gather() %>%
     round_df(3) %>%
     dplyr::rename(metric = key,
                   estimate = value) %>%
-    mutate(metric = dplyr::recode(metric,
-                                  "pred" = es_label,
-                                  "ci.lb" = "95% CI lower",
-                                  "ci.ub" = "95% CI upper",
-                                  "cr.lb" = "95% CR lower",
-                                  "cr.ub" = "95% CR upper"))
+    dplyr::mutate(metric = dplyr::recode(metric,
+                                         "pred" = es_label,
+                                         "ci.lb" = "95% CI lower",
+                                         "ci.ub" = "95% CI upper",
+                                         "cr.lb" = "95% CR lower",
+                                         "cr.ub" = "95% CR upper"))
   
   
   if (effect_size %in% c("ruscios_A", "A")) {
@@ -106,9 +106,9 @@ sced_meta_analysis <- function(results, effect_size, baseline_trend_exclusion_cr
     # convert generalized odds ratios to probabilities
     predictions_as_probabilities <- predictions %>%
       dplyr::mutate(estimate = estimate/(1 + estimate),
-             metric = str_replace(metric, "Generalized Odds Ratio", "Ruscio's A")) %>%
+                    metric = str_replace(metric, "Generalized Odds Ratio", "Ruscio's A")) %>%
       round_df(3) %>%
-      filter(metric != "se")
+      dplyr::filter(metric != "se")
     
     # only round odds ratios after probabilities have been calculated to prevent information loss
     predictions <- round_df(predictions, 2)

@@ -47,6 +47,6 @@ ruscios_A <- function(data, variable, group, value1 = 1, value2 = 0, adjust_ceil
   nx <- length(x)
   ny <- length(y)
   A.obs <- ruscios_A_function(x, y)
-
+  
   return(A.obs)
 }

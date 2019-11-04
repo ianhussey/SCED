@@ -15,37 +15,37 @@
 simulate_data <- function(participants = 10, timepoints_a = 15, timepoints_b = 15, cohens_d = 1.5) {
   require(simstudy)
   require(tidyverse)
-
+  
   parameters_a <-
-    defData(varname = "Score", dist = "normal", formula = 0,   variance = 1, id = "idnum")
-
+    simstudy::defData(varname = "Score", dist = "normal", formula = 0,   variance = 1, id = "idnum")
+  
   parameters_b <-
-    defData(varname = "Score", dist = "normal", formula = cohens_d, variance = 1, id = "idnum")
-
+    simstudy::defData(varname = "Score", dist = "normal", formula = cohens_d, variance = 1, id = "idnum")
+  
   # generate required number of data points using above parameters
   data_a <- genData(participants*timepoints_a, parameters_a) %>%
     # create a participant variable
-    mutate(Participant = ceiling(idnum/timepoints_a),
-           Condition = "A") %>%
+    dplyr::mutate(Participant = ceiling(idnum/timepoints_a),
+                  Condition = "A") %>%
     # create a timepoint variable
     dplyr::rename(Timepoint = idnum) %>%
-    group_by(Participant) %>%
-    mutate(Timepoint = row_number()) %>%
-    ungroup()
-
+    dplyr::group_by(Participant) %>%
+    dplyr::mutate(Timepoint = row_number()) %>%
+    dplyr::ungroup()
+  
   data_b <- genData(participants*timepoints_b, parameters_b) %>%
     # create a participant variable
-    mutate(Participant = ceiling(idnum/timepoints_b),
-           Condition = "B") %>%
+    dplyr::mutate(Participant = ceiling(idnum/timepoints_b),
+                  Condition = "B") %>%
     # create a timepoint variable
     dplyr::rename(Timepoint = idnum) %>%
-    group_by(Participant) %>%
-    mutate(Timepoint = row_number() + timepoints_a) %>%
-    ungroup()
-
+    dplyr::group_by(Participant) %>%
+    dplyr::mutate(Timepoint = row_number() + timepoints_a) %>%
+    dplyr::ungroup()
+  
   data <- rbind(data_a, data_b) %>%
-    mutate(Score = round(Score, 2)) %>%
-    arrange(Participant, Condition, Timepoint)
-
+    dplyr::mutate(Score = round(Score, 2)) %>%
+    dplyr::arrange(Participant, Condition, Timepoint)
+  
   return(data)
 }
