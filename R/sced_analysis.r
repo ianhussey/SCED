@@ -25,6 +25,10 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   
   data(simulated_data)
   
+  # drop NAs from relevant columns
+  data <- data %>%
+    drop_na(Timepoint, Score, Participant, Condition)
+    
   # trends at baseline and post intervention
   baseline_trend <- data %>%
     dplyr::filter(Condition == "A") %>%

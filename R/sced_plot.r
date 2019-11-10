@@ -12,15 +12,15 @@ sced_plot <- function(data) {
   
   data_with_condition_change <- data %>% 
     dplyr::group_by(Participant) %>% 
-    dplyr::summarize(condition_change = max(Timepoint[Condition == "A"]) + 0.5) %>% 
+    dplyr::summarize(condition_change = max(Timepoint[Condition == "A"], na.rm = TRUE) + 0.5) %>% 
     dplyr::right_join(data, by = "Participant") %>% 
-    dplyr::group_by(Participant, Condition) %>% mutate(median_score = median(Score)) %>% 
+    dplyr::group_by(Participant, Condition) %>% mutate(median_score = median(Score, na.rm = TRUE)) %>% 
     dplyr::ungroup()
   
   intervention_point <- data %>% 
     dplyr::filter(Condition == "B") %>% 
     dplyr::group_by(Participant) %>% 
-    dplyr::summarize(intervention_point = min(Timepoint)) %>% 
+    dplyr::summarize(intervention_point = min(Timepoint, na.rm = TRUE)) %>% 
     dplyr::ungroup()
   
   plot_data <- data_with_condition_change %>% 
