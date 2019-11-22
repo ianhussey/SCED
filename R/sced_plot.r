@@ -14,7 +14,9 @@ sced_plot <- function(data) {
     dplyr::group_by(Participant) %>% 
     dplyr::summarize(condition_change = max(Timepoint[Condition == "A"], na.rm = TRUE) + 0.5) %>% 
     dplyr::right_join(data, by = "Participant") %>% 
-    dplyr::group_by(Participant, Condition) %>% mutate(median_score = median(Score, na.rm = TRUE)) %>% 
+    dplyr::group_by(Participant, Condition) %>% 
+    mutate(median_score = median(Score, na.rm = TRUE),
+           mad = mad(Score, na.rm = TRUE)) %>% 
     dplyr::ungroup()
   
   intervention_point <- data %>% 
@@ -29,8 +31,10 @@ sced_plot <- function(data) {
     dplyr::mutate(Participant = forcats::fct_reorder(Participant, intervention_point))
   
   plot <- ggplot(plot_data) + 
-    geom_smooth(aes(x = Timepoint, y = Score, group = Condition), 
-                method = "lm", alpha = 0.15, colour = "black") + 
+    geom_ribbon(aes(x = Timepoint, ymin = median_score - mad, ymax = median_score + mad, group = Condition), 
+                fill = "lightgrey") +
+    geom_smooth(aes(x = Timepoint, y = Score, group = Condition),
+                method = "lm", alpha = 0.0, colour = "black", size = 0.5) +
     geom_line(aes(x = Timepoint, y = median_score, group = Condition), linetype = "dashed") + 
     geom_point(aes(x = Timepoint, y = Score, group = Condition)) + 
     geom_line(aes(x = Timepoint, y = Score, group = Condition)) + 
@@ -38,7 +42,8 @@ sced_plot <- function(data) {
     geom_vline(aes(xintercept = condition_change), linetype = "dotted", 
                color = "black") + theme_classic() + scale_color_manual(values = c("#000000", "#bc1414")) + 
     theme(legend.position = "none") + 
-    facet_wrap(~Participant, ncol = 1)
+    facet_wrap(~Participant, ncol = 1) +
+    ylab("Score")
   
   return(plot)
 }

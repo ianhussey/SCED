@@ -5,12 +5,17 @@
 #' @param n_boots: number of bootstrapped resamples for Hedges' g and Ruscio's A. N for p value permutation is n_boots*10. 
 #' @param invert_effect_sizes: Effect sizes are reported assuming that scores in timepoint B are expected to be higher than timepoint A (i.e., that the intervention causes scores to increase). If invert_effect_sizes == TRUE then effect sizes are inverted, e.g., if the intervention is expected to causes scores to decrease.
 #' @param adjust_probability_ceiling: Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. Ie., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.  
-#' @return Baseline trend: standardized beta OLS regression coefficient for the slope between the timepoint A data points. Treats the timepoints as equally spaced integers (e.g., rather than modelling them as dates). Can be used to exclude participants from consideration in meta analysis, e.g., on the basis that improvements at followup are due to improvement trends at baseline.
-#' @return Intervention trend: standardized beta OLS regression coefficient for the slope between the timepoint B data points. Treats the timepoints as equally spaced integers (e.g., rather than modelling them as dates). 
-#' @return p: Hypothesis test p value via permutation test. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
-#' @return median_difference: Difference between the median value of A and the median value of B. Because Ruscio's A is non-parametric it can notionally suffer from ceiling effects, e.g., where A = 1.00 but the real difference between the groups are larger or smaller. It can therefore be useful to report the unstandardized effect size as well as the standardized effect sizes. Median difference is used here over mean difference given its greater robustness.
-#' @return ruscios_A: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's d of 1.5 corrisponds to an A of 0.85.
-#' @return hedges_g: Effect size Hedge's g effect size via bootstrapping, a version of Cohen's d that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's d. Included here for familiarity: it's parametric assumtions (equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts. In order to relax the assumption of normality a bootstrapped implemenation is employed.
+#' @return n_A: Number of data points in phase A
+#' @return n_B: Number of data points in phase B
+#' @return deviation_A: Median Absolute Deviation of data points in phase A
+#' @return deviation_B: Median Absolute Deviation of data points in phase B
+#' @return deviation_A_likely_outlier: It can be useful to know if a participant demonstrates poorer consistency within the baseline phase (phase A). There is a tradition within the visual analysis of SCED data to exclude participants who demonstrate such low 'consistency'. In addition to this, the meta analysis of the unstandardized effect size between participants (i.e., the calculation of the median median-difference between phases) tacitly relies on equal variances between participants. Although, it should be noted that both standardized effect sizes (Ruscio's A and Hedges' g) do *not* rely on the assumption of equal variance between participants (indeed, this is one of the rationales for standardization), and so no exclusions based on baseline consistency are necessary for the correct interpretation of them. In order to highlight outliers, this package relies on between subject meta analysis of median absolute deviations of the data in phase A. The metafor package's influence.rma.uni() function is used to conduct leave one out analyses. Four separate metrics that can indicate whether a participant are calculated, and if one or more flag the participant as a potential outlier this variable is returned with a star ("*"). See the metafor package's documentation for more details. This variable should not be used to thoughtlessly exclude participants, but should be combined with insepction of the SCED plot and best judgement. Sensitivity analyses run with and wihtout any outliers can also be useful.
+#' @return trend_A: ordinal regression slope between the phase A data points by timepoint. Treats the timepoints as ordinally spaced integers (e.g., rather than modelling them as dates). Can be used to exclude participants from consideration in meta analysis, e.g., on the basis that differences between phases can be difficult to interpret if improvement trends are observed in phase A. Sensitivity analyses can be conducted by excluding participants with phase A trends greater than a given absolute value (e.g., +/-0.3). 
+#' @return trend_B: ordinal regression slope between the phase B data points by timepoint. Can indicate ongoing improvement in phase B.
+#' @return p: Hypothesis test p value via permutation test assessing the differences in scores between the two phases. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
+#' @return median_difference: Difference in scores between the median values in the two phases. Because Ruscio's A effect size is probability based (see below) it can suffer from ceiling effects. I.e., when all timepoints in phase B are larger than all timepoints in phase A, Ruscio's A cannot distinguish futher between large and very large effect sizes. It can therefore be useful to report the unstandardized effect size as well as the standardized effect sizes. 
+#' @return ruscios_A: Differences in scores between the two phases using Ruscio's A (Ruscio, 2008). The probability that a randomly selected timepoint in phase B is larger than a randomly selected timepoint in phase A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/and the probability of superiority. A Cohen's d of 1.5 corrisponds to an A of 0.85.
+#' @return hedges_g: Differences in scores between the two phases using Hedge's g effect size via bootstrapping, a version of Cohen's d that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's d. Included here for familiarity: it's parametric assumtions (equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts. In order to relax the assumption of normality a bootstrapped implemenation is employed.
 #' @export
 #' @examples
 #' sced_results <- sced_analysis(data = simulated_data)
@@ -22,45 +27,68 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   require(coin)
   require(effsize)
   require(bootES)
-  
+  require(metafor)
+
   data(simulated_data)
   
   # drop NAs from relevant columns
   data <- data %>%
     drop_na(Timepoint, Score, Participant, Condition)
-    
-  # trends at baseline and post intervention
-  baseline_trend <- data %>%
-    dplyr::filter(Condition == "A") %>%
-    # standardize data
-    dplyr::mutate(standardized_score = as.numeric(scale(Score))) %>%
-    # fit linear model for each participant
-    dplyr::group_by(Participant) %>%
-    dplyr::mutate(timepoint_integer          = row_number(),
-                  timepoint_integer_centered = as.numeric(scale(timepoint_integer))) %>%
-    do(tidy(lm(standardized_score ~ timepoint_integer_centered, data = .))) %>%
-    dplyr::ungroup() %>%
-    # extract standardized beta estimates
-    dplyr::filter(term == "timepoint_integer_centered") %>%
-    # tidy names
-    dplyr::mutate(`Baseline trend`    = round(estimate, 2)) %>%
-    dplyr::select(Participant, `Baseline trend`)
   
-  post_intervention_trend <- data %>%
-    dplyr::filter(Condition == "B") %>%
-    # standardize data
-    dplyr::mutate(standardized_score = as.numeric(scale(Score))) %>%
-    # fit linear model for each participant
-    dplyr::group_by(Participant) %>%
-    dplyr::mutate(timepoint_integer = row_number(),
-                  timepoint_integer_centered = as.numeric(scale(timepoint_integer))) %>%
-    do(tidy(lm(standardized_score ~ timepoint_integer_centered, data = .))) %>%
+  # trends at baseline and post intervention
+  trends <- data %>%
+    # fit linear model for each participant and condition
+    dplyr::group_by(Participant, Condition) %>%
+    dplyr::mutate(timepoint_integer          = row_number()) %>%
+    do(tidy(lm(rank(Score) ~ rank(timepoint_integer), data = .))) %>%
     dplyr::ungroup() %>%
     # extract standardized beta estimates
-    dplyr::filter(term == "timepoint_integer_centered") %>%
+    dplyr::filter(term == "rank(timepoint_integer)") %>%
     # tidy names
-    dplyr::mutate(`Intervention trend` = round(estimate, 2)) %>%
-    dplyr::select(Participant, `Intervention trend`)
+    dplyr::mutate(Trend = estimate) %>%
+    dplyr::select(Participant, Condition, Trend) %>% 
+    spread(Condition, Trend) %>%
+    dplyr::rename(trend_A = A,
+                  trend_B = B) %>%
+    round_df(2)
+  
+  # median absolute deviation for each participant and condition to assess consistency within that phase
+  deviations <- data %>%
+    dplyr::group_by(Participant, Condition) %>%
+    dplyr::summarize(mad = mad(Score)) %>%
+    dplyr::select(Participant, Condition, mad) %>% 
+    spread(Condition, mad) %>%
+    dplyr::rename(deviation_A = A,
+                  deviation_B = B) %>%
+    round_df(2)
+  
+  timepoints <- data %>%
+    dplyr::group_by(Participant, Condition) %>%
+    dplyr::summarize(n = n()) %>%
+    dplyr::select(Participant, Condition, n) %>% 
+    spread(Condition, n) %>%
+    dplyr::rename(n_A = A,
+                  n_B = B)
+  
+  deviations_and_timepoints <- left_join(timepoints, deviations, by = "Participant")
+  
+  # find likely phase A deviation outliers
+  ## fit meta analysis of phase A deviations
+  deviation_meta_fit <- deviations_and_timepoints %>%
+    dplyr::mutate(yi = deviation_A,
+                  vi = deviation_A^2/(2*n_A)) %>% # variance of deviation
+    metafor::rma(yi = yi, 
+                 vi = vi,
+                 data = .)
+  
+  deviation_outliers <- metafor::influence.rma.uni(deviation_meta_fit)$inf %>%
+    as.data.frame() %>%
+    rownames_to_column(var = "Participant") %>%
+    round_df(2) %>%
+    dplyr::rename(deviation_A_likely_outlier = `inf`) %>%
+    dplyr::select(deviation_A_likely_outlier)
+  
+  deviations_and_timepoints_and_outliers <- bind_cols(deviations_and_timepoints, deviation_outliers)
   
   # p values via non-parametric permutation tests
   p_by_participant <- data %>%
@@ -108,10 +136,12 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
                      ci.type     = "bca",
                      ci.conf     = 0.95)
     
-    results <- data.frame(hedges_g        = round(fit$t0,        3),
-                          hedges_g_se     = round(sd(fit$t),     3),
-                          hedges_g_ci_lwr = round(fit$bounds[1], 3),
-                          hedges_g_ci_upr = round(fit$bounds[2], 3))
+    results <- data.frame(hedges_g        = fit$t0,
+                          hedges_g_se     = sd(fit$t),
+                          hedges_g_ci_lwr = fit$bounds[1],
+                          hedges_g_ci_upr = fit$bounds[2]) %>%
+      round_df(2)
+    
   }
   
   hedges_g_by_participant <- data %>%
@@ -120,12 +150,13 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     dplyr::ungroup()
   
   # combine results
-  results <- baseline_trend %>%
-    dplyr::left_join(post_intervention_trend,       by = "Participant") %>%
+  results <- deviations_and_timepoints_and_outliers %>%
+    dplyr::left_join(trends,                        by = "Participant") %>%
     dplyr::left_join(p_by_participant,              by = "Participant") %>%
     dplyr::left_join(median_change,                 by = "Participant") %>%
     dplyr::left_join(ruscios_A_boot_by_participant, by = "Participant") %>%
-    dplyr::left_join(hedges_g_by_participant,       by = "Participant")
+    dplyr::left_join(hedges_g_by_participant,       by = "Participant") %>%
+    ungroup()
   
   # conditionally invert effect sizes results
   if (invert_effect_sizes == TRUE){

@@ -19,6 +19,10 @@ install_github("ianhussey/SCED")
 library(SCED)
 ```
 
+## Overview
+
+See the vignette for an examle workflow (vignettes/vignette.Rmd) 
+
 ## Main functions 
 
 ### simulate_ab_data()
@@ -27,9 +31,7 @@ Simulate data that meets the required format of `sced_analysis()` and `sced_plot
 
 ### sced_plot()
 
-Panes represent individual participants with ID numbers included above each. Vertical dotted lines separate experimental conditions A and B (e.g., pre and post intervention). Horizontal dashed lines represent median values in each expeirmental condition. Linear regression lines and error bars are also included to higlight change trends within conditions. 
-
-![plot](./screenshots/plot.png)
+Panes represent individual participants with ID numbers included above each. Vertical dotted lines separate experimental conditions A and B (e.g., pre and post intervention). Horizontal dashed lines represent median values in each expeirmental condition. 
 
 ### sced_analysis()
 
@@ -50,17 +52,14 @@ Rough *a priori* power analysis for SCED's between subjects meta analysis based 
 
 ## To do
 
-- Add a Ruscio's A conversion to the meta analysis function.
+- Explicate that the expectation is that B>A, and add option to reverse (which is more than inverting the probability in cases of ties)
 
-- Change CIs in the meta analysis to using bootstrapping rather than Wald estimation
+- Change Rusico's A point estimate to the whole sample estimate rather than the median bootstrap?
 
-  - http://www.metafor-project.org/doku.php/tips:bootstrapping_with_ma
-  - Possibly also CIs for heterogeneity metrics, see https://rdrr.io/cran/metafor/man/robust.html
+- add meta power analysis to vignette
 
-- How to establish stability at baseline, either retrospectively or in an optional stopping fashion (i.e., optional condition switching once stability has been reached)?
+- update screenshots in readme
 
-  - Theil-Sen slope would be more robust than the OLS slopes used in the plots. However, optional-transition designs would suffer from the changing power of the test as *n* grows. All methods I know of are unrobust or have power problems. For the moment, I rely on visual inspection of the OLS linear regression line. 
-
-- Add additional other terminology for *A* from Parker (2009). 
+- Add additional other terminology for *A* from Parker (2009), and relate A to tau    
 
   

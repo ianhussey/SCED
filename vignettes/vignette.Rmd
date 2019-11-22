@@ -35,6 +35,8 @@ library(bootES)
 library(boot)
 library(stringr)
 library(timesavers)  # from github/ianhussey
+library(finalfit)
+library(metafor)
 
 # disable scientific notation
 options(scipen = 999) 
@@ -51,7 +53,7 @@ Baseline trends also identified using standardized beta regression coefficients.
 
 ```{r}
 
-# save copy
+# save copy of simlulated data that is bunled with the package
 write_csv(simulated_data, "example_data.csv")
 
 # analyse
@@ -85,7 +87,12 @@ You can optionally exclude participants from the meta analysis using the `baseli
 meta_analysis <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
 
 # forest plot
-forest_plot(meta_analysis, effect_size = "ruscios_A")
+metafor::forest(meta_analysis$model_fit,
+                xlab = "Probability of superiority (Ruscio's A)",
+                digits = 2,
+                transf = SCED::logodds_to_probability,  # convert log odds back to probabilities (ie Ruscio's A)
+                addcred = TRUE,
+                refline = 0.5)
 
 ```
 
@@ -106,3 +113,5 @@ data <- simulate_data(participants = 2,     # two participants
   mutate(Participant = paste("Participant", Participant))
 
 ```
+
+

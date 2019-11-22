@@ -17,17 +17,27 @@ sced_analysis(data, n_boots = 2000, invert_effect_sizes = FALSE,
 \item{adjust_probability_ceiling:}{Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. Ie., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.}
 }
 \value{
-Baseline trend: standardized beta OLS regression coefficient for the slope between the timepoint A data points. Treats the timepoints as equally spaced integers (e.g., rather than modelling them as dates). Can be used to exclude participants from consideration in meta analysis, e.g., on the basis that improvements at followup are due to improvement trends at baseline.
+n_A: Number of data points in phase A
 
-Intervention trend: standardized beta OLS regression coefficient for the slope between the timepoint B data points. Treats the timepoints as equally spaced integers (e.g., rather than modelling them as dates).
+n_B: Number of data points in phase B
 
-p: Hypothesis test p value via permutation test. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
+deviation_A: Median Absolute Deviation of data points in phase A
 
-median_difference: Difference between the median value of A and the median value of B. Because Ruscio's A is non-parametric it can notionally suffer from ceiling effects, e.g., where A = 1.00 but the real difference between the groups are larger or smaller. It can therefore be useful to report the unstandardized effect size as well as the standardized effect sizes. Median difference is used here over mean difference given its greater robustness.
+deviation_B: Median Absolute Deviation of data points in phase B
 
-ruscios_A: Effect size A (Ruscio, 2008). The probability that a randomly selected timepoint in condition B is larger than a randomly selected timepoint in condition A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/the probability of superiority but with no parametric assumptions. A Cohen's d of 1.5 corrisponds to an A of 0.85.
+deviation_A_likely_outlier: It can be useful to know if a participant demonstrates poorer consistency within the baseline phase (phase A). There is a tradition within the visual analysis of SCED data to exclude participants who demonstrate such low 'consistency'. In addition to this, the meta analysis of the unstandardized effect size between participants (i.e., the calculation of the median median-difference between phases) tacitly relies on equal variances between participants. Although, it should be noted that both standardized effect sizes (Ruscio's A and Hedges' g) do *not* rely on the assumption of equal variance between participants (indeed, this is one of the rationales for standardization), and so no exclusions based on baseline consistency are necessary for the correct interpretation of them. In order to highlight outliers, this package relies on between subject meta analysis of median absolute deviations of the data in phase A. The metafor package's influence.rma.uni() function is used to conduct leave one out analyses. Four separate metrics that can indicate whether a participant are calculated, and if one or more flag the participant as a potential outlier this variable is returned with a star ("*"). See the metafor package's documentation for more details. This variable should not be used to thoughtlessly exclude participants, but should be combined with insepction of the SCED plot and best judgement. Sensitivity analyses run with and wihtout any outliers can also be useful.
 
-hedges_g: Effect size Hedge's g effect size via bootstrapping, a version of Cohen's d that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's d. Included here for familiarity: it's parametric assumtions (equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts. In order to relax the assumption of normality a bootstrapped implemenation is employed.
+trend_A: ordinal regression slope between the phase A data points by timepoint. Treats the timepoints as ordinally spaced integers (e.g., rather than modelling them as dates). Can be used to exclude participants from consideration in meta analysis, e.g., on the basis that differences between phases can be difficult to interpret if improvement trends are observed in phase A. Sensitivity analyses can be conducted by excluding participants with phase A trends greater than a given absolute value (e.g., +/-0.3).
+
+trend_B: ordinal regression slope between the phase B data points by timepoint. Can indicate ongoing improvement in phase B.
+
+p: Hypothesis test p value via permutation test assessing the differences in scores between the two phases. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
+
+median_difference: Difference in scores between the median values in the two phases. Because Ruscio's A effect size is probability based (see below) it can suffer from ceiling effects. I.e., when all timepoints in phase B are larger than all timepoints in phase A, Ruscio's A cannot distinguish futher between large and very large effect sizes. It can therefore be useful to report the unstandardized effect size as well as the standardized effect sizes.
+
+ruscios_A: Differences in scores between the two phases using Ruscio's A (Ruscio, 2008). The probability that a randomly selected timepoint in phase B is larger than a randomly selected timepoint in phase A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/and the probability of superiority. A Cohen's d of 1.5 corrisponds to an A of 0.85.
+
+hedges_g: Differences in scores between the two phases using Hedge's g effect size via bootstrapping, a version of Cohen's d that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's d. Included here for familiarity: it's parametric assumtions (equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts. In order to relax the assumption of normality a bootstrapped implemenation is employed.
 }
 \description{
 Analyse data from an AB design SCED experiment using non-parametric frequentist tests
