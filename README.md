@@ -1,6 +1,6 @@
 # SCED
 
-An R package for robust analysis, plotting and meta analysis of data from A-B Single Case Experiment Designs using [exact tests](https://en.wikipedia.org/wiki/Exact_test) and [robust effect sizes](https://www.ncbi.nlm.nih.gov/pubmed/18331151).
+An R package for robust analysis, plotting and meta analysis of data from A-B Single Case Experiment Designs using [exact tests](https://en.wikipedia.org/wiki/Exact_test), [robust effect sizes](https://www.ncbi.nlm.nih.gov/pubmed/18331151) and meta analysis of these effect sizes.
 
 ## Author
 
@@ -8,7 +8,9 @@ Ian Hussey (ian.hussey@ugent.be)
 
 ## License
 
-GPLv3+
+[GPLv3+](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3))
+
+You may use, copy, distribute and modify this software, as long as you (a) track any changes or additions you make to it (e.g., by submitting pull requests) and (b) make your changes or additions available to others.
 
 ## Installation
 
@@ -33,6 +35,8 @@ Simulate data that meets the required format of `sced_analysis()` and `sced_plot
 
 Panes represent individual participants with ID numbers included above each. Vertical dotted lines separate experimental conditions A and B (e.g., pre and post intervention). Horizontal dashed lines represent median values in each expeirmental condition. 
 
+![plot](./screenshots/plot.png)
+
 ### sced_analysis()
 
 Calculates the following statistics:
@@ -48,15 +52,13 @@ Conduct a random effects meta analysis of the robust standardized effect sizes (
 
 ### power_meta()
 
-Rough *a priori* power analysis for SCED's between subjects meta analysis based on the equations derived from Valentine et al (2009) by Quintana ([2017](https://towardsdatascience.com/how-to-calculate-statistical-power-for-your-meta-analysis-e108ee586ae8)). Some approximations are made: e.g., Valentine et al assume a between groups design and the use of Cohen's *d* over the SCED package's Hedge's *g*. The function therefore likely underestimates power somewhat. Note that power analysis should not be used in isolation to determine sample size: number of participants, timepoints, etc should also take methodological recommendations for SCEDs into account. 
+Rough *a priori* power analysis for SCED's between subjects meta analysis based on the equations derived from Valentine et al. (2009) by Quintana ([2017](https://towardsdatascience.com/how-to-calculate-statistical-power-for-your-meta-analysis-e108ee586ae8)). Some approximations are made: e.g., Valentine et al assume a between groups design and the use of Cohen's *d* over the SCED package's Hedge's *g*. The function therefore likely underestimates power by a small degree. Note that power analysis should not be used in isolation to determine sample size: number of participants, timepoints, etc should also take methodological recommendations for SCEDs into account. 
 
 ## To do
 
 - Explicate that the expectation is that B>A, and add option to reverse (which is more than inverting the probability in cases of ties)
 
 - Change Rusico's A point estimate to the whole sample estimate rather than the median bootstrap?
-
-- add meta power analysis to vignette
 
 - update screenshots in readme
 
