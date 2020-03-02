@@ -27,8 +27,8 @@ sced_plot <- function(data) {
   
   plot_data <- data_with_condition_change %>% 
     dplyr::left_join(intervention_point, by = "Participant") %>% 
-    dplyr::mutate(Participant = as.factor(Participant)) %>%
-    dplyr::mutate(Participant = forcats::fct_reorder(Participant, intervention_point))
+    dplyr::mutate(Participant = as.factor(Participant),
+                  Participant = forcats::fct_reorder(Participant, intervention_point))
   
   plot <- ggplot(plot_data) + 
     geom_ribbon(aes(x = Timepoint, ymin = median_score - mad, ymax = median_score + mad, group = Condition), 
@@ -43,7 +43,7 @@ sced_plot <- function(data) {
                color = "black") + theme_classic() + scale_color_manual(values = c("#000000", "#bc1414")) + 
     theme(legend.position = "none") + 
     facet_wrap(~Participant, ncol = 1) +
-    ylab("Score")
+    ylab("Score") 
   
   return(plot)
 }
