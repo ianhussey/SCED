@@ -9,23 +9,29 @@
 #' @param baseline_trend_exclusion_criterion If set to a numeric value, cases with a baseline trend (ie standardized beta OLS regression value for the timepoint A scores) with an absolute value greater than this numeric value will be excluded from the meta analysis.
 #' @export
 #' @examples
-#' # meta analysis
-#' meta_analysis <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
+#' results <- sced_analysis(data = simulated_data)
+#' 
+#' # fit meta
+#' sced_meta_fit <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
 #' 
 #' # return results
-#' meta_analysis$meta_effect_size
-#' meta_analysis$meta_heterogeneity
+#' sced_meta_fit$meta_effect_size
+#' sced_meta_fit$meta_heterogeneity
 #' 
 #' # forest plot
-#' forest(meta_analysis$model_fit,
-#'        xlab = "Probability of superiority (Ruscio's A)",
-#'        digits = 2,
-#'        transf = SCED::logodds_to_probability,  # convert log odds back to probabilities (ie Ruscio's A)
-#'        addcred = TRUE,
-#'        refline = 0.5)
+#' metafor::forest(sced_meta_fit$model_fit,
+#'                 xlab = "Probability of superiority (Ruscio's A)",
+#'                 transf = SCED::logodds_to_probability,  #' convert log odds back to probabilities (ie Ruscio's A)
+#'                 mlab = SCED::add_heterogeneity_metrics_to_forest(sced_meta_fit$model_fit),
+#'                 digits = 2,
+#'                 addcred = TRUE,
+#'                 refline = 0.5)
 #' 
 
-sced_meta_analysis <- function(results, effect_size = "ruscios_A", baseline_trend_exclusion_criterion = NULL) {
+sced_meta_analysis <- function(results, 
+                               effect_size = "ruscios_A", 
+                               baseline_trend_exclusion_criterion = NULL, 
+                               baseline_variance_exclude_outliers = FALSE) {
   
   require(tidyverse)
   require(metafor)
@@ -35,7 +41,15 @@ sced_meta_analysis <- function(results, effect_size = "ruscios_A", baseline_tren
   if (is.numeric(baseline_trend_exclusion_criterion)) {
     
     results <- results %>%
-      dplyr::filter(abs(trend_a) <= baseline_trend_exclusion_criterion)
+      dplyr::filter(abs(trend_A) <= baseline_trend_exclusion_criterion)
+    
+  }
+  
+  # exclude participants due to baseline trends
+  if (is.numeric(baseline_variance_exclude_outliers)) {
+    
+    results <- results %>%
+      dplyr::filter(deviation_A_likely_outlier != "*")
     
   }
   
