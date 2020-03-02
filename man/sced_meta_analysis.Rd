@@ -4,8 +4,12 @@
 \alias{sced_meta_analysis}
 \title{Meta analyse standardized effect sizes across single cases}
 \usage{
-sced_meta_analysis(results, effect_size = "ruscios_A",
-  baseline_trend_exclusion_criterion = NULL)
+sced_meta_analysis(
+  results,
+  effect_size = "ruscios_A",
+  baseline_trend_exclusion_criterion = NULL,
+  baseline_variance_exclude_outliers = FALSE
+)
 }
 \arguments{
 \item{results}{Output of sced_analysis().}
@@ -21,19 +25,22 @@ Please note that the CIs reported in the meta analysis may differ from those rep
 Meta analysis is done via a maximum likelihood random effects model using a gaussian link function for both Ruscio's A and Hedges' g effect sizes. In the case of Ruscio's A, this means that effect sizes are non parametric at the individual level, but the underlying effect is assumed to vary normally between participants. Other strategies for the meta analysis of probability are possible (e.g., some have employed logit link functions), but due to its relative rarity no best practices have yet emerged.
 }
 \examples{
-# meta analysis
-meta_analysis <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
+results <- sced_analysis(data = simulated_data)
+
+# fit meta
+sced_meta_fit <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
 
 # return results
-meta_analysis$meta_effect_size
-meta_analysis$meta_heterogeneity
+sced_meta_fit$meta_effect_size
+sced_meta_fit$meta_heterogeneity
 
 # forest plot
-forest(meta_analysis$model_fit,
-       xlab = "Probability of superiority (Ruscio's A)",
-       digits = 2,
-       transf = SCED::logodds_to_probability,  # convert log odds back to probabilities (ie Ruscio's A)
-       addcred = TRUE,
-       refline = 0.5)
+metafor::forest(sced_meta_fit$model_fit,
+                xlab = "Probability of superiority (Ruscio's A)",
+                transf = SCED::logodds_to_probability,  #' convert log odds back to probabilities (ie Ruscio's A)
+                mlab = SCED::add_heterogeneity_metrics_to_forest(sced_meta_fit$model_fit),
+                digits = 2,
+                addcred = TRUE,
+                refline = 0.5)
 
 }

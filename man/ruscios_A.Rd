@@ -4,8 +4,14 @@
 \alias{ruscios_A}
 \title{Ruscio's A - the probability of superiority}
 \usage{
-ruscios_A(data, variable, group, value1 = 1, value2 = 0,
-  adjust_ceiling = FALSE)
+ruscios_A(
+  data,
+  variable,
+  group,
+  value1 = 1,
+  value2 = 0,
+  adjust_ceiling = FALSE
+)
 }
 \arguments{
 \item{data}{data}

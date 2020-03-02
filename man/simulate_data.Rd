@@ -4,17 +4,19 @@
 \alias{simulate_data}
 \title{Simulate AB SCED data}
 \usage{
-simulate_data(participants = 10, timepoints_a = 15,
-  timepoints_b = 15, cohens_d = 1.5)
+simulate_data(
+  participants = 10,
+  timepoints_a = 15,
+  timepoints_b = 15,
+  cohens_d = 1.5
+)
 }
 \arguments{
 \item{participants}{number of participants to simulate}
 
-\item{timepoints_a}{number of timepoints to simulate for condition A}
+\item{timepoints_a}{number of timepoints to simulate for condition B}
 
 \item{cohens_d}{the true effect size to simulate. Default of Cohen's d = 1.5, which corrisponds to a Ruscio's A of 0.85. NB this is stated in Cohen's d rather than Hedges' g because g is sample size dependent where d is not.}
-
-\item{timepoints_a}{number of timepoints to simulate for condition B}
 }
 \description{
 Simulate data for an AB SCED design using simstudy
