@@ -94,7 +94,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   p_by_participant <- data %>%
     dplyr::group_by(Participant) %>%
     do(p = pvalue(independence_test(Score ~ as.factor(Condition),
-                                    distribution = approximate(B = n_boots*10), # needs more than other tests
+                                    distribution = approximate(nresample = n_boots*10), # needs more than other tests
                                     data = .))) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(p = as.numeric(p),
