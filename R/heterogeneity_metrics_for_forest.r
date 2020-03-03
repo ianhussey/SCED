@@ -17,6 +17,7 @@
 #'                 digits = 2,
 #'                 addcred = TRUE,
 #'                 refline = 0.5)
+#' @export
 
 heterogeneity_metrics_for_forest <- function(fit) {
   bquote(paste("RE Model (", 

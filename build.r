@@ -36,7 +36,7 @@ cat_function <- function(love=TRUE){
 
 library(devtools)
 setwd("~/git/SCED")
-document()
+roxygen2::roxygenise()
 
 # # 6 install the package
 
