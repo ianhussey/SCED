@@ -114,4 +114,26 @@ data <- simulate_data(participants = 2,     # two participants
 
 ```
 
+# Power analysis for SCED meta analysis
+
+Rough approximation of power for the between-participant meta analysis of effects, using equations derived from Valentine, Pigott, & Rothstein ([2010](https://doi.org/10.3102/1076998609346961)), derived by Quintana ([2017](https://towardsdatascience.com/how-to-calculate-statistical-power-for-your-meta-analysis-e108ee586ae8)), and applied to within-subject SCED designs here.
+
+yi: Meta-analyzed hedges' g effect size. NBs 1) Although Cohen's rules of thumb (.2 = small, .5 = medium, .8 = large), larger effect sizes are often observed in SCED due to the within subject designs (e.g., above 1.0). 2) Valentine's equations assume a between-groups design but here we apply to within-subjects effect sizes. Power is therefore likely to be underestimated. 3) Valentine's equations employ Cohen's d effect size but we use the Hedges' g effect size which has been bias corrected for small samples. 
+
+ni: The average number of data points per phase (i.e., in each of A and B, before or after the intervention). Assuming equal number of total time points for all participants, this is roughly equal to half the total number of time points. NB again, Valentine's equations assume a between-groups design but here we apply to within-subjects effect sizes. Power is therefore likely to be underestimated.
+
+k: The number of participants.
+
+tau^2: The tau^2 metric of between participant heterogeneity, as produced by the meta analysis function. If data from previous studies is not available, historically reccommended cutoffs are .33 for small, 1.0 for moderate, & 3.0 for large. Given that SCED studies have historically argued that the method possesses strong replicability, with each participant functioning as an experiment that is then replicated, it should be possible to split data collection into exploratory and confirmatory stages, and use data from the exploratory phase (e.g., first 5 participants) to determine the likely power that will be observed in the confirmatory phase (e.g., remaining 7 participants). 
+
+
+```{r}
+
+# returns power (1 - beta)
+power_meta(yi = 0.40, 
+           ni = 30,
+           k  = 6,
+           tau2 = 0.3)
+
+```
 

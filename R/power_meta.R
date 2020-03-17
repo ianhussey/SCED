@@ -6,6 +6,7 @@
 #' @param k The number of participants.
 #' @param tau2 The tau^2 metric of between participant heterogeneity, as produced by the meta analysis function. If data from previous studies is not available, historically reccommended cutoffs are .33 for small, 1.0 for moderate, & 3.0 for large.
 #' @return Statistical power (i.e., 1 - Beta), the probability of observing a significant result given the parameters. 
+#' @export
 #' @examples
 #' power_meta(yi = 0.5, 
 #'            ni = 25,

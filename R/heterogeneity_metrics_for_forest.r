@@ -2,6 +2,7 @@
 #'
 #' This function converts a metafor metaanalysis fit object to a string that contains the I^2 and H^2 heterogeneity statistics so that it can easily be added to a metafor forest plot.  
 #' @param fit The meta analysis fit object outputted by sced_meta_analysis()
+#' @export
 #' @examples
 #' # calculate participant level results
 #' results <- sced_analysis(data = data)
@@ -17,7 +18,6 @@
 #'                 digits = 2,
 #'                 addcred = TRUE,
 #'                 refline = 0.5)
-#' @export
 
 heterogeneity_metrics_for_forest <- function(fit) {
   bquote(paste("RE Model (", 
