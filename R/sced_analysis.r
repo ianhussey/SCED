@@ -46,21 +46,23 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     dplyr::filter(term == "rank(timepoint_integer)") %>%
     # tidy names
     dplyr::select(Participant, Condition, estimate, std.error) %>%
-    dplyr::mutate(trend_ci = paste0("[", formatC(round(estimate-std.error*1.96, 2), format = 'f', digits = 2), 
-                                    ", ", formatC(round(estimate+std.error*1.96, 2), format = 'f', digits = 2), "]")) %>%
+    dplyr::mutate(trend_ci_lwr = estimate-std.error*1.96,
+                  trend_ci_upr = estimate+std.error*1.96) %>%
     round_df(2)
   
   trend_A <- trends %>%
     filter(Condition == "A") %>%
     rename(trend_A = estimate,
-           trend_A_ci = trend_ci) %>%
-    select(Participant, trend_A, trend_A_ci)
+           trend_A_ci_lwr = trend_ci_lwr,
+           trend_A_ci_upr = trend_ci_upr) %>%
+    select(Participant, trend_A, trend_A_ci_lwr, trend_A_ci_upr)
   
   trend_B <- trends %>%
     filter(Condition == "B") %>%
     rename(trend_B = estimate,
-           trend_B_ci = trend_ci) %>%
-    select(Participant, trend_B, trend_B_ci)
+           trend_B_ci_lwr = trend_ci_lwr,
+           trend_B_ci_upr = trend_ci_upr) %>%
+    select(Participant, trend_B, trend_B_ci_lwr, trend_B_ci_upr)
 
   # median absolute deviation for each participant and condition to assess consistency within that phase
   deviations <- data %>%
