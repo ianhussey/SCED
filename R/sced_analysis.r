@@ -39,19 +39,29 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   trends <- data %>%
     # fit linear model for each participant and condition
     dplyr::group_by(Participant, Condition) %>%
-    dplyr::mutate(timepoint_integer          = row_number()) %>%
+    dplyr::mutate(timepoint_integer = row_number()) %>%
     do(tidy(lm(rank(Score) ~ rank(timepoint_integer), data = .))) %>%
     dplyr::ungroup() %>%
     # extract standardized beta estimates
     dplyr::filter(term == "rank(timepoint_integer)") %>%
     # tidy names
-    dplyr::mutate(Trend = estimate) %>%
-    dplyr::select(Participant, Condition, Trend) %>% 
-    spread(Condition, Trend) %>%
-    dplyr::rename(trend_A = A,
-                  trend_B = B) %>%
+    dplyr::select(Participant, Condition, estimate, std.error) %>%
+    dplyr::mutate(trend_ci = paste0("[", formatC(round(estimate-std.error*1.96, 2), format = 'f', digits = 2), 
+                                    ", ", formatC(round(estimate+std.error*1.96, 2), format = 'f', digits = 2), "]")) %>%
     round_df(2)
   
+  trend_A <- trends %>%
+    filter(Condition == "A") %>%
+    rename(trend_A = estimate,
+           trend_A_ci = trend_ci) %>%
+    select(Participant, trend_A, trend_A_ci)
+  
+  trend_B <- trends %>%
+    filter(Condition == "B") %>%
+    rename(trend_B = estimate,
+           trend_B_ci = trend_ci) %>%
+    select(Participant, trend_B, trend_B_ci)
+
   # median absolute deviation for each participant and condition to assess consistency within that phase
   deviations <- data %>%
     dplyr::group_by(Participant, Condition) %>%
@@ -151,7 +161,8 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   
   # combine results
   results <- deviations_and_timepoints_and_outliers %>%
-    dplyr::left_join(trends,                        by = "Participant") %>%
+    dplyr::left_join(trend_A,                       by = "Participant") %>%
+    dplyr::left_join(trend_B,                       by = "Participant") %>%
     dplyr::left_join(p_by_participant,              by = "Participant") %>%
     dplyr::left_join(median_change,                 by = "Participant") %>%
     dplyr::left_join(ruscios_A_boot_by_participant, by = "Participant") %>%
