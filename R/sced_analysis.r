@@ -4,7 +4,8 @@
 #' @param data Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.
 #' @param n_boots: number of bootstrapped resamples for Hedges' g and Ruscio's A. N for p value permutation is n_boots*10. 
 #' @param invert_effect_sizes: Effect sizes are reported assuming that scores in timepoint B are expected to be higher than timepoint A (i.e., that the intervention causes scores to increase). If invert_effect_sizes == TRUE then effect sizes are inverted, e.g., if the intervention is expected to causes scores to decrease.
-#' @param adjust_probability_ceiling: Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. Ie., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.  
+#' @param adjust_probability_ceiling: Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. I.e., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.  
+#' @param assess_deviation_outliers: By default, a meta analysis of deviations at baseline is run in order to detect outliers. SCED analysts often argue that you should start with a stable baseline. This represents an attempt to quantify what counts as stable vs not by comparing baseline variation between participants. However, the code may throw an error here if any participant's variation is extremely low. If so, you can simply not run this analysis by setting this parameter to FALSE. 
 #' @return n_A: Number of data points in phase A
 #' @return n_B: Number of data points in phase B
 #' @return deviation_A: Median Absolute Deviation of data points in phase A
@@ -20,7 +21,7 @@
 #' @examples
 #' sced_results <- sced_analysis(data = simulated_data)
 
-sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adjust_probability_ceiling = TRUE) {
+sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adjust_probability_ceiling = TRUE, assess_deviation_outliers = TRUE) {
   
   require(tidyverse)
   require(broom)
@@ -67,7 +68,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   # median absolute deviation for each participant and condition to assess consistency within that phase
   deviations <- data %>%
     dplyr::group_by(Participant, Condition) %>%
-    dplyr::summarize(mad = mad(Score)) %>%
+    dplyr::summarize(mad = mad(Score), .groups = "keep") %>%
     dplyr::select(Participant, Condition, mad) %>% 
     spread(Condition, mad) %>%
     dplyr::rename(deviation_A = A,
@@ -76,7 +77,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   
   timepoints <- data %>%
     dplyr::group_by(Participant, Condition) %>%
-    dplyr::summarize(n = n()) %>%
+    dplyr::summarize(n = n(), .groups = "keep") %>%
     dplyr::select(Participant, Condition, n) %>% 
     spread(Condition, n) %>%
     dplyr::rename(n_A = A,
@@ -85,22 +86,31 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   deviations_and_timepoints <- left_join(timepoints, deviations, by = "Participant")
   
   # find likely phase A deviation outliers
-  ## fit meta analysis of phase A deviations
-  deviation_meta_fit <- deviations_and_timepoints %>%
-    dplyr::mutate(yi = deviation_A,
-                  vi = deviation_A^2/(2*n_A)) %>% # variance of deviation
-    metafor::rma(yi = yi, 
-                 vi = vi,
-                 data = .)
+  if(assess_deviation_outliers == TRUE){
+    
+    ## fit meta analysis of phase A deviations
+    deviation_meta_fit <- deviations_and_timepoints %>%
+      dplyr::mutate(yi = deviation_A,
+                    vi = deviation_A^2/(2*n_A)) %>% # variance of deviation
+      metafor::rma(yi = yi, 
+                   vi = vi,
+                   data = .)
+    
+    deviation_outliers <- metafor::influence.rma.uni(deviation_meta_fit)$inf %>%
+      as.data.frame() %>%
+      rownames_to_column(var = "Participant") %>%
+      round_df(2) %>%
+      dplyr::rename(deviation_A_likely_outlier = `inf`) %>%
+      dplyr::select(deviation_A_likely_outlier)
+    
+    deviations_and_timepoints_and_outliers <- bind_cols(deviations_and_timepoints, deviation_outliers)
+    
+  } else {
+    
+    deviations_and_timepoints_and_outliers <- deviations_and_timepoints
+    
+  }
   
-  deviation_outliers <- metafor::influence.rma.uni(deviation_meta_fit)$inf %>%
-    as.data.frame() %>%
-    rownames_to_column(var = "Participant") %>%
-    round_df(2) %>%
-    dplyr::rename(deviation_A_likely_outlier = `inf`) %>%
-    dplyr::select(deviation_A_likely_outlier)
-  
-  deviations_and_timepoints_and_outliers <- bind_cols(deviations_and_timepoints, deviation_outliers)
   
   # p values via non-parametric permutation tests
   p_by_participant <- data %>%
@@ -117,7 +127,8 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     dplyr::summarize(median_a          = median(Score[Condition == "A"]),
                      median_b          = median(Score[Condition == "B"]),
                      median_difference = median_b - median_a,
-                     na.rm             = TRUE) %>%
+                     na.rm             = TRUE,
+                     .groups           = "keep") %>%
     dplyr::select(Participant, median_difference)
   
   # bootstrapped Ruscio's nonparametric effect size A
@@ -153,6 +164,8 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
                           hedges_g_ci_lwr = fit$bounds[1],
                           hedges_g_ci_upr = fit$bounds[2]) %>%
       round_df(2)
+    
+    return(results)
     
   }
   
