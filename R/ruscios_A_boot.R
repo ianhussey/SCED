@@ -33,9 +33,9 @@ ruscios_A_boot <- function(data, variable, group, value1 = 1, value2 = 0,
     # if adjust_ceiling == TRUE & A == 0 or 1, rescore it as if a single data point was inferior to a single second data point between conditions. 
     # Ie., use the lowest granularity allowed by the data for rescoring. More data points will result in a higher adjusted A.
     if(adjust_ceiling == TRUE & A == 1){
-      A <- ruscios_A_function(c(rep(4, length(x)), 2), c(rep(1, length(y)), 3))
+      A <- ruscios_A_function(c(rep(4, length(x)-1), 2), c(rep(1, length(y)-1), 3))
     } else if(adjust_ceiling == TRUE & A == 0){
-      A <- 1 - ruscios_A_function(c(rep(4, length(x)), 2), c(rep(1, length(y)), 3))
+      A <- 1 - ruscios_A_function(c(rep(4, length(x)-1), 2), c(rep(1, length(y)-1), 3))
     }
     return(A)
   }

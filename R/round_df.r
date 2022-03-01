@@ -7,8 +7,6 @@
 #' @examples
 #' round_df(my_data, digits = 2)
 
-round_df <- function(df, digits) {
-  nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
-  df[,nums] <- round(df[,nums], digits = digits)
-  (df)
+round_df <- function(df, digits = 3){
+  df %>% mutate_if(is.numeric, round, digits = digits)
 }
