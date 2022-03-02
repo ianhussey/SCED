@@ -12,7 +12,7 @@
 #' 
 #' # forest plot
 #' metafor::forest(sced_meta_fit$model_fit,
-#'                 xlab = "Probability of superiority (Ruscio's A)",
+#'                 xlab = "Probability of superiority",
 #'                 transf = SCED::logodds_to_probability,  #' convert log odds back to probabilities (ie Ruscio's A)
 #'                 mlab = SCED::heterogeneity_metrics_for_forest(sced_meta_fit$model_fit),
 #'                 digits = 2,
@@ -20,7 +20,11 @@
 #'                 refline = 0.5)
 
 heterogeneity_metrics_for_forest <- function(fit) {
-  bquote(paste("RE Model (", 
-               italic('I')^"2", " = ", .(formatC(format(round(fit$I2, 1), nsmall = 1))),
-               "%, ", italic('H')^"2", " = ", .(formatC(format(round(fit$H2, 1), nsmall = 1))), ")"))
+  if(exists("fit$I2") & exists("fit$H2")){
+    bquote(paste("RE Model (", 
+                 italic('I')^"2", " = ", .(formatC(format(round(fit$I2, 1), nsmall = 1))),
+                 "%, ", italic('H')^"2", " = ", .(formatC(format(round(fit$H2, 1), nsmall = 1))), ")"))
+  } else {
+    stop("I2 and/or H2 do not exist in the model object")
+  }
 }
