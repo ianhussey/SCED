@@ -48,8 +48,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     # tidy names
     dplyr::select(Participant, Condition, estimate, std.error) %>%
     dplyr::mutate(trend_ci_lwr = estimate-std.error*1.96,
-                  trend_ci_upr = estimate+std.error*1.96) %>%
-    round_df(2)
+                  trend_ci_upr = estimate+std.error*1.96) 
   
   trend_A <- trends %>%
     filter(Condition == "A") %>%
@@ -72,8 +71,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     dplyr::select(Participant, Condition, mad) %>% 
     spread(Condition, mad) %>%
     dplyr::rename(deviation_A = A,
-                  deviation_B = B) %>%
-    round_df(2)
+                  deviation_B = B) 
   
   timepoints <- data %>%
     dplyr::group_by(Participant, Condition) %>%
@@ -99,7 +97,6 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     deviation_outliers <- metafor::influence.rma.uni(deviation_meta_fit)$inf %>%
       as.data.frame() %>%
       rownames_to_column(var = "Participant") %>%
-      round_df(2) %>%
       dplyr::rename(deviation_A_likely_outlier = `inf`) %>%
       dplyr::select(deviation_A_likely_outlier)
     
@@ -165,20 +162,36 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
                               ci.type     = "bca",
                               ci.conf     = 0.95))
     
-    # if variance is too low, bootstrapping can throw an error and return the original data frame. If so, return stats as NA.
+    # if variance is too low for example because a participant provides the same response on all items in both phases,
+    # bootstrapping can throw an error and return the original data frame. If so, return stats as 0 with a minimal 
     if(is.list(fit)) {
       results <- data.frame(hedges_g        = fit$t0,
                             hedges_g_se     = sd(fit$t, na.rm = TRUE),
                             hedges_g_ci_lwr = fit$bounds[1],
-                            hedges_g_ci_upr = fit$bounds[2]) %>%
-        round_df(2)
+                            hedges_g_ci_upr = fit$bounds[2]) 
     } else {
       results <- data.frame(hedges_g        = 0,
                             hedges_g_se     = 0,
                             hedges_g_ci_lwr = 0,
                             hedges_g_ci_upr = 0)
-    }
+    } 
     
+    # in the case that there is (almost) no variation, all will == .50. Use the data's granularity to jitter the CIs.
+    if(adjust_probability_ceiling == TRUE) {
+      results <- results %>%
+        rowwise() %>%
+        mutate(hedges_g_se = ifelse(hedges_g == hedges_g_ci_lwr & 
+                                      hedges_g == hedges_g_ci_upr & 
+                                      hedges_g == 0, 0.001, hedges_g_ci_lwr),
+               hedges_g_ci_lwr = ifelse(hedges_g == hedges_g_ci_lwr & 
+                                          hedges_g == hedges_g_ci_upr & 
+                                          hedges_g == 0, -0.002, hedges_g_ci_lwr),
+               hedges_g_ci_upr = ifelse(hedges_g == hedges_g_ci_lwr & 
+                                          hedges_g == hedges_g_ci_upr & 
+                                          hedges_g == 0, +0.002, hedges_g_ci_upr)) %>%
+        ungroup()
+    }
+
     return(results)
   }
   

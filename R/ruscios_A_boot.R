@@ -109,11 +109,50 @@ ruscios_A_boot <- function(data, variable, group, value1 = 1, value2 = 0,
     }
   }
   
+  # recode impossible values, only occur with almost no variance 
+  A.obs <- case_when(A.obs < 0 ~ 0,
+                     A.obs > 1 ~ 1,
+                     TRUE ~ A.obs)
+  
+  CI.Lower <- case_when(CI.Lower < 0 ~ 0,
+                        CI.Lower > 1 ~ 1,
+                        TRUE ~ CI.Lower)
+  
+  CI.Upper <- case_when(CI.Upper < 0 ~ 0,
+                        CI.Upper > 1 ~ 1,
+                        TRUE ~ CI.Upper)
+  
+  # if adjust_ceiling == TRUE & A == 0 or 1, rescore it as if a single data point was inferior to a single second data point between conditions.
+  # Ie., use the lowest granularity allowed by the data for rescoring. More data points will result in a higher adjusted A.
+  if(adjust_ceiling == TRUE) {
+    
+    if(CI.Upper == 1){
+      CI.Upper <- ruscios_A_function(c(rep(4, length(x)-1), 2), c(rep(1, length(y)-1), 3))
+    } else if (CI.Upper == 0){
+      CI.Upper <- 1 - ruscios_A_function(c(rep(4, length(x)-1), 2), c(rep(1, length(y)-1), 3))
+    }
+    
+    if(CI.Lower == 1){
+      CI.Lower <- ruscios_A_function(c(rep(4, length(x)-1), 2), c(rep(1, length(y)-1), 3))
+    } else if (CI.Lower == 0){
+      CI.Lower <- 1 - ruscios_A_function(c(rep(4, length(x)-1), 2), c(rep(1, length(y)-1), 3))
+    }
+    
+    # in the case that there is (almost) no variation, all will == .50. Use the data's granularity to jitter the CIs.
+    if(A.obs == CI.Lower & 
+       A.obs == CI.Upper & 
+       A.obs == 0.50) {
+      CI.Lower <- 0.50 - (1 - ruscios_A_function(c(rep(4, length(x)-1), 2), c(rep(1, length(y)-1), 3)))
+      CI.Upper <- 0.50 + (1 - ruscios_A_function(c(rep(4, length(x)-1), 2), c(rep(1, length(y)-1), 3)))
+    }
+    
+  }
+  
   # return A, SE of A, lower limit of CI, upper limit of CI
-  results <- data.frame(ruscios_A        = round(A.obs,         3),
-                        ruscios_A_se     = round(sd(BS.Values), 3),
-                        ruscios_A_ci_lwr = round(CI.Lower,      3),
-                        ruscios_A_ci_upr = round(CI.Upper,      3))
+  results <- data.frame(ruscios_A        = A.obs,
+                        ruscios_A_se     = sd(BS.Values),
+                        ruscios_A_ci_lwr = CI.Lower,
+                        ruscios_A_ci_upr = CI.Upper)
   
   return(results)
 }
