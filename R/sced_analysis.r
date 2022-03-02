@@ -201,12 +201,21 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   if (invert_effect_sizes == TRUE){
     results <- results %>%
       dplyr::mutate(ruscios_A = 1 - ruscios_A,
-                    ruscios_A_ci_lwr = 1 - ruscios_A_ci_lwr,
-                    ruscios_A_ci_upr = 1 - ruscios_A_ci_upr,
+                    ruscios_A_ci_upr_temp = 1 - ruscios_A_ci_lwr,
+                    ruscios_A_ci_lwr = 1 - ruscios_A_ci_upr,
                     hedges_g = hedges_g*-1,
-                    hedges_g_ci_lwr = hedges_g_ci_lwr*-1,
-                    hedges_g_ci_upr = hedges_g_ci_upr*-1)
-  }  
+                    hedges_g_ci_upr_temp = hedges_g_ci_lwr*-1,
+                    hedges_g_ci_lwr = hedges_g_ci_upr*-1) %>%
+      select(-ruscios_A_ci_upr, -hedges_g_ci_upr) %>%
+      rename(ruscios_A_ci_upr = ruscios_A_ci_upr_temp,
+             hedges_g_ci_upr = hedges_g_ci_upr_temp) %>%
+      # reorder columns
+      select(Participant, n_A, n_B, deviation_A, deviation_B,
+             trend_A, trend_A_ci_lwr, trend_A_ci_upr, trend_B, trend_B_ci_lwr, trend_B_ci_upr,
+             p, median_difference,
+             ruscios_A, ruscios_A_se, ruscios_A_ci_lwr, ruscios_A_ci_upr,
+             hedges_g, hedges_g_se, hedges_g_ci_lwr, hedges_g_ci_upr)
+  }
   
   return(results)
 }
