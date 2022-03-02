@@ -29,7 +29,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   require(effsize)
   require(bootES)
   require(metafor)
-
+  
   data(simulated_data)
   
   # drop NAs from relevant columns
@@ -64,7 +64,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
            trend_B_ci_lwr = trend_ci_lwr,
            trend_B_ci_upr = trend_ci_upr) %>%
     select(Participant, trend_B, trend_B_ci_lwr, trend_B_ci_upr)
-
+  
   # median absolute deviation for each participant and condition to assess consistency within that phase
   deviations <- data %>%
     dplyr::group_by(Participant, Condition) %>%
@@ -115,17 +115,24 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   # p values via non-parametric permutation tests
   p_by_participant <- data %>%
     dplyr::group_by(Participant) %>%
-    do(p = pvalue(independence_test(Score ~ as.factor(Condition),
-                                    distribution = approximate(nresample = n_boots*10), # needs more than other tests
-                                    data = .))) %>%
+    do(p =
+         {
+           try(pvalue(independence_test(Score ~ as.factor(Condition),
+                                        distribution = approximate(nresample = n_boots*10), # needs more than other tests
+                                        data = .)), 
+               silent = TRUE)
+         }
+    ) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(p = as.numeric(p),
-                  p = format_pval_better(p))
+    dplyr::mutate(p = ifelse(str_detect(p, "Error"), NA, p),
+                  p = as.numeric(p),
+                  p = format_pval_better(p),
+                  p = ifelse(is.na(p), "> .9999", p))
   
   median_change <- data %>%
     dplyr::group_by(Participant) %>%
-    dplyr::summarize(median_a          = median(Score[Condition == "A"]),
-                     median_b          = median(Score[Condition == "B"]),
+    dplyr::summarize(median_a          = median(Score[Condition == "A"], na.rm = TRUE),
+                     median_b          = median(Score[Condition == "B"], na.rm = TRUE),
                      median_difference = median_b - median_a,
                      na.rm             = TRUE,
                      .groups           = "keep") %>%
@@ -149,24 +156,30 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     require(bootES)
     require(tidyverse)
     
-    fit <- data %>%
-      bootES::bootES(.,
-                     R           = n_boots,
-                     data.col    = "Score",
-                     group.col   = "Condition",
-                     contrast    = c(A = -1, B = 1),
-                     effect.type = "hedges.g",
-                     ci.type     = "bca",
-                     ci.conf     = 0.95)
+    fit <- try(bootES::bootES(data,
+                              R           = n_boots,
+                              data.col    = "Score",
+                              group.col   = "Condition",
+                              contrast    = c(A = -1, B = 1),
+                              effect.type = "hedges.g",
+                              ci.type     = "bca",
+                              ci.conf     = 0.95))
     
-    results <- data.frame(hedges_g        = fit$t0,
-                          hedges_g_se     = sd(fit$t),
-                          hedges_g_ci_lwr = fit$bounds[1],
-                          hedges_g_ci_upr = fit$bounds[2]) %>%
-      round_df(2)
+    # if variance is too low, bootstrapping can throw an error and return the original data frame. If so, return stats as NA.
+    if(is.list(fit)) {
+      results <- data.frame(hedges_g        = fit$t0,
+                            hedges_g_se     = sd(fit$t, na.rm = TRUE),
+                            hedges_g_ci_lwr = fit$bounds[1],
+                            hedges_g_ci_upr = fit$bounds[2]) %>%
+        round_df(2)
+    } else {
+      results <- data.frame(hedges_g        = 0,
+                            hedges_g_se     = 0,
+                            hedges_g_ci_lwr = 0,
+                            hedges_g_ci_upr = 0)
+    }
     
     return(results)
-    
   }
   
   hedges_g_by_participant <- data %>%
