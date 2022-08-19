@@ -6,7 +6,7 @@
 #' @examples
 #' sced_plot(data = simulated_data)
 
-sced_plot <- function(data) {
+sced_plot <- function(data, show_MAD_interval = FALSE) {
   require(tidyverse)
   require(forcats)
   
@@ -30,20 +30,35 @@ sced_plot <- function(data) {
     dplyr::mutate(Participant = as.factor(Participant),
                   Participant = forcats::fct_reorder(Participant, intervention_point))
   
-  plot <- ggplot(plot_data) + 
-    geom_ribbon(aes(x = Timepoint, ymin = median_score - mad, ymax = median_score + mad, group = Condition), 
-                fill = "lightgrey") +
-    geom_smooth(aes(x = Timepoint, y = Score, group = Condition),
-                method = "lm", alpha = 0.0, colour = "black", size = 0.5) +
-    geom_line(aes(x = Timepoint, y = median_score, group = Condition), linetype = "dashed") + 
-    geom_point(aes(x = Timepoint, y = Score, group = Condition)) + 
-    geom_line(aes(x = Timepoint, y = Score, group = Condition)) + 
-    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) + 
-    geom_vline(aes(xintercept = condition_change), linetype = "dotted", 
-               color = "black") + theme_classic() + scale_color_manual(values = c("#000000", "#bc1414")) + 
-    theme(legend.position = "none") + 
-    facet_wrap(~Participant, ncol = 1) +
-    ylab("Score") 
+  if(show_MAD_interval == TRUE){
+    plot <- ggplot(plot_data) + 
+      geom_ribbon(aes(x = Timepoint, ymin = median_score - mad, ymax = median_score + mad, group = Condition), 
+                  fill = "lightgrey") +
+      geom_smooth(aes(x = Timepoint, y = Score, group = Condition),
+                  method = "lm", alpha = 0.0, colour = "black", size = 0.5) +
+      geom_line(aes(x = Timepoint, y = median_score, group = Condition), linetype = "dashed") + 
+      geom_point(aes(x = Timepoint, y = Score, group = Condition)) + 
+      geom_line(aes(x = Timepoint, y = Score, group = Condition)) + 
+      scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) + 
+      geom_vline(aes(xintercept = condition_change), linetype = "dotted", 
+                 color = "black") + theme_classic() + scale_color_manual(values = c("#000000", "#bc1414")) + 
+      theme(legend.position = "none") + 
+      facet_wrap(~Participant, ncol = 1) +
+      ylab("Score") 
+  } else {
+    plot <- ggplot(plot_data) + 
+      geom_smooth(aes(x = Timepoint, y = Score, group = Condition),
+                  method = "lm", alpha = 0.0, colour = "black", size = 0.5) +
+      geom_line(aes(x = Timepoint, y = median_score, group = Condition), linetype = "dashed") + 
+      geom_point(aes(x = Timepoint, y = Score, group = Condition)) + 
+      geom_line(aes(x = Timepoint, y = Score, group = Condition)) + 
+      scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) + 
+      geom_vline(aes(xintercept = condition_change), linetype = "dotted", 
+                 color = "black") + theme_classic() + scale_color_manual(values = c("#000000", "#bc1414")) + 
+      theme(legend.position = "none") + 
+      facet_wrap(~Participant, ncol = 1) +
+      ylab("Score") 
+  }
   
   return(plot)
 }

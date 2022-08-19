@@ -38,7 +38,7 @@ sced_meta_fit$meta_heterogeneity
 metafor::forest(sced_meta_fit$model_fit,
                 xlab = "Probability of superiority (Ruscio's A)",
                 transf = SCED::logodds_to_probability,  #' convert log odds back to probabilities (ie Ruscio's A)
-                mlab = SCED::add_heterogeneity_metrics_to_forest(sced_meta_fit$model_fit),
+                mlab = SCED::heterogeneity_metrics_for_forest(sced_meta_fit$model_fit),
                 digits = 2,
                 addcred = TRUE,
                 refline = 0.5)

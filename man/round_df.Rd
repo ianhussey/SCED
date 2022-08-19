@@ -4,7 +4,7 @@
 \alias{round_df}
 \title{round_df}
 \usage{
-round_df(df, digits)
+round_df(df, digits = 3)
 }
 \arguments{
 \item{df}{Dataframe to be rounded.}

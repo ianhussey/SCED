@@ -8,7 +8,8 @@ sced_analysis(
   data,
   n_boots = 2000,
   invert_effect_sizes = FALSE,
-  adjust_probability_ceiling = TRUE
+  adjust_probability_ceiling = TRUE,
+  assess_deviation_outliers = TRUE
 )
 }
 \arguments{
@@ -18,7 +19,9 @@ sced_analysis(
 
 \item{invert_effect_sizes:}{Effect sizes are reported assuming that scores in timepoint B are expected to be higher than timepoint A (i.e., that the intervention causes scores to increase). If invert_effect_sizes == TRUE then effect sizes are inverted, e.g., if the intervention is expected to causes scores to decrease.}
 
-\item{adjust_probability_ceiling:}{Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. Ie., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.}
+\item{adjust_probability_ceiling:}{Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. I.e., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.}
+
+\item{assess_deviation_outliers:}{By default, a meta analysis of deviations at baseline is run in order to detect outliers. SCED analysts often argue that you should start with a stable baseline. This represents an attempt to quantify what counts as stable vs not by comparing baseline variation between participants. However, the code may throw an error here if any participant's variation is extremely low. If so, you can simply not run this analysis by setting this parameter to FALSE.}
 }
 \value{
 n_A: Number of data points in phase A
