@@ -22,7 +22,7 @@ sced_meta_analysis(
 Meta analyse the standardized effect sizes (Ruscio's A or Hedges' g) provided by sced_analyse.
 Uses the metafor package under the hood. 
 Please note that the CIs reported in the meta analysis may differ from those reported by sced_analyse(), as the meta analysis uses the standard error for estimation rather than the empirical CIs, which can be asymmetric. When combined with the next point below, this means that the CIs in the meta analysis can be < 0 or > 1, outside the bounds of the observable values for Ruscio's A. If the meta analysed effect size intervals are < 0 or > 1 they can be reported as 0 or 1 instead.
-Meta analysis is done via a maximum likelihood random effects model using a gaussian link function for both Ruscio's A and Hedges' g effect sizes. In the case of Ruscio's A, this means that effect sizes are non parametric at the individual level, but the underlying effect is assumed to vary normally between participants. Other strategies for the meta analysis of probability are possible (e.g., some have employed logit link functions), but due to its relative rarity no best practices have yet emerged.
+Meta analysis is done via a maximum likelihood random effects model using a gaussian link function for both Ruscio's A and Hedges' g effect sizes. In the case of Ruscio's A, this means that effect sizes are non parametric at the individual level, but the underlying effect is assumed to vary between participants following a normal distribution. Ruscio's A effect sizes are logit transformed prior to meta analysis and backtransformed for reporting.
 }
 \examples{
 results <- sced_analysis(data = simulated_data)
@@ -37,8 +37,8 @@ sced_meta_fit$meta_heterogeneity
 # forest plot
 metafor::forest(sced_meta_fit$model_fit,
                 xlab = "Probability of superiority (Ruscio's A)",
-                transf = SCED::logodds_to_probability,  #' convert log odds back to probabilities (ie Ruscio's A)
-                mlab = SCED::heterogeneity_metrics_for_forest(sced_meta_fit$model_fit),
+                transf = boot::inv.logit, # convert logits back to probabilities (ie Ruscio's A)
+                mlab = heterogeneity_metrics_for_forest(sced_meta_fit$model_fit),
                 digits = 2,
                 addcred = TRUE,
                 refline = 0.5)

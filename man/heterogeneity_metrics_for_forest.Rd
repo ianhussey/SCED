@@ -22,9 +22,10 @@ sced_meta_fit <- sced_meta_analysis(results = results, effect_size = "ruscios_A"
 # forest plot
 metafor::forest(sced_meta_fit$model_fit,
                 xlab = "Probability of superiority",
-                transf = SCED::logodds_to_probability,  #' convert log odds back to probabilities (ie Ruscio's A)
-                mlab = SCED::heterogeneity_metrics_for_forest(sced_meta_fit$model_fit),
+                transf = boot::inv.logit,  # convert logits back to probabilities (ie Ruscio's A)
+                mlab = heterogeneity_metrics_for_forest(sced_meta_fit$model_fit),
                 digits = 2,
                 addcred = TRUE,
                 refline = 0.5)
+                
 }

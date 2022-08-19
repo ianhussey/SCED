@@ -9,7 +9,7 @@ sced_analysis(
   n_boots = 2000,
   invert_effect_sizes = FALSE,
   adjust_probability_ceiling = TRUE,
-  assess_deviation_outliers = TRUE
+  assess_deviation_outliers = FALSE
 )
 }
 \arguments{

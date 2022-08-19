@@ -21,7 +21,7 @@
 #' @examples
 #' sced_results <- sced_analysis(data = simulated_data)
 
-sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adjust_probability_ceiling = TRUE, assess_deviation_outliers = TRUE) {
+sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adjust_probability_ceiling = TRUE, assess_deviation_outliers = FALSE) {
   
   require(tidyverse)
   require(broom)
