@@ -129,7 +129,6 @@ sced_meta_analysis <- function(results,
               median_median_difference_unstandardized_effect_size = mdn_mdn_diff,
               model_fit = meta_fit,
               meta_analysed_standardized_effect_size = predictions,
-              meta_analysed_standardized_effect_size_as_probability = predictions_as_probabilities,
               meta_effect_size = meta_effect_string,
               meta_heterogeneity = meta_heterogeneity_string))
   
