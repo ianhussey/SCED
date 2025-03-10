@@ -4,7 +4,7 @@ An R package for robust analysis, plotting and meta analysis of data from A-B Si
 
 ## Author
 
-Ian Hussey (ian.hussey@ugent.be)
+Ian Hussey (ian.hussey -at- unibe.ch)
 
 ## License
 
