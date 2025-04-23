@@ -1,47 +1,53 @@
 #' Analyse data
 #'
 #' Analyse data from an AB design SCED experiment using non-parametric frequentist tests
+#' @import dplyr
+#' @import tidyr
+#' @importFrom stringr str_detect
+#' @import metafor
+#' @importFrom tibble rownames_to_column
+#' @importFrom bootES bootES
+#' @importFrom coin independence_test
+#' @importFrom purrr pmap
+#' @importFrom broom tidy
 #' @param data Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.
-#' @param n_boots: number of bootstrapped resamples for Hedges' g and Ruscio's A. N for p value permutation is n_boots*10. 
-#' @param invert_effect_sizes: Effect sizes are reported assuming that scores in timepoint B are expected to be higher than timepoint A (i.e., that the intervention causes scores to increase). If invert_effect_sizes == TRUE then effect sizes are inverted, e.g., if the intervention is expected to causes scores to decrease.
-#' @param adjust_probability_ceiling: Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. I.e., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.  
-#' @param assess_deviation_outliers: By default, a meta analysis of deviations at baseline is run in order to detect outliers. SCED analysts often argue that you should start with a stable baseline. This represents an attempt to quantify what counts as stable vs not by comparing baseline variation between participants. However, the code may throw an error here if any participant's variation is extremely low. If so, you can simply not run this analysis by setting this parameter to FALSE. 
-#' @return n_A: Number of data points in phase A
-#' @return n_B: Number of data points in phase B
-#' @return deviation_A: Median Absolute Deviation of data points in phase A
-#' @return deviation_B: Median Absolute Deviation of data points in phase B
-#' @return deviation_A_likely_outlier: It can be useful to know if a participant demonstrates poorer consistency within the baseline phase (phase A). There is a tradition within the visual analysis of SCED data to exclude participants who demonstrate such low 'consistency'. In addition to this, the meta analysis of the unstandardized effect size between participants (i.e., the calculation of the median median-difference between phases) tacitly relies on equal variances between participants. Although, it should be noted that both standardized effect sizes (Ruscio's A and Hedges' g) do *not* rely on the assumption of equal variance between participants (indeed, this is one of the rationales for standardization), and so no exclusions based on baseline consistency are necessary for the correct interpretation of them. In order to highlight outliers, this package relies on between subject meta analysis of median absolute deviations of the data in phase A. The metafor package's influence.rma.uni() function is used to conduct leave one out analyses. Four separate metrics that can indicate whether a participant are calculated, and if one or more flag the participant as a potential outlier this variable is returned with a star ("*"). See the metafor package's documentation for more details. This variable should not be used to thoughtlessly exclude participants, but should be combined with insepction of the SCED plot and best judgement. Sensitivity analyses run with and wihtout any outliers can also be useful.
-#' @return trend_A: ordinal regression slope between the phase A data points by timepoint. Treats the timepoints as ordinally spaced integers (e.g., rather than modelling them as dates). Can be used to exclude participants from consideration in meta analysis, e.g., on the basis that differences between phases can be difficult to interpret if improvement trends are observed in phase A. Sensitivity analyses can be conducted by excluding participants with phase A trends greater than a given absolute value (e.g., +/-0.3). 
-#' @return trend_B: ordinal regression slope between the phase B data points by timepoint. Can indicate ongoing improvement in phase B.
-#' @return p: Hypothesis test p value via permutation test assessing the differences in scores between the two phases. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
-#' @return median_difference: Difference in scores between the median values in the two phases. Because Ruscio's A effect size is probability based (see below) it can suffer from ceiling effects. I.e., when all timepoints in phase B are larger than all timepoints in phase A, Ruscio's A cannot distinguish futher between large and very large effect sizes. It can therefore be useful to report the unstandardized effect size as well as the standardized effect sizes. 
-#' @return ruscios_A: Differences in scores between the two phases using Ruscio's A (Ruscio, 2008). The probability that a randomly selected timepoint in phase B is larger than a randomly selected timepoint in phase A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/and the probability of superiority. A Cohen's d of 1.5 corrisponds to an A of 0.85.
-#' @return hedges_g: Differences in scores between the two phases using Hedge's g effect size via bootstrapping, a version of Cohen's d that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's d. Included here for familiarity: it's parametric assumtions (equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts. In order to relax the assumption of normality a bootstrapped implemenation is employed.
+#' @param n_boots number of bootstrapped resamples for Hedges' g and Ruscio's A. N for p value permutation is n_boots*10. 
+#' @param invert_effect_sizes Effect sizes are reported assuming that scores in timepoint B are expected to be higher than timepoint A (i.e., that the intervention causes scores to increase). If invert_effect_sizes == TRUE then effect sizes are inverted, e.g., if the intervention is expected to causes scores to decrease.
+#' @param adjust_probability_ceiling Should Ruscio's A estimates of 0 and 1 be adjusted so that they can be converted to finite odds ratios? This is done by rescoring a single data point as being was inferior to a single second data point between the conditions. I.e., it uses the best granularity allowed by the data, as more data points will result in a more extreme possible values of A.  
+#' @param assess_deviation_outliers By default, a meta analysis of deviations at baseline is run in order to detect outliers. SCED analysts often argue that you should start with a stable baseline. This represents an attempt to quantify what counts as stable vs not by comparing baseline variation between participants. However, the code may throw an error here if any participant's variation is extremely low. If so, you can simply not run this analysis by setting this parameter to FALSE. 
+#' @return n_A Number of data points in phase A
+#' @return n_B Number of data points in phase B
+#' @return deviation_A Median Absolute Deviation of data points in phase A
+#' @return deviation_B Median Absolute Deviation of data points in phase B
+#' @return deviation_A_likely_outlier It can be useful to know if a participant demonstrates poorer consistency within the baseline phase (phase A). There is a tradition within the visual analysis of SCED data to exclude participants who demonstrate such low 'consistency'. In addition to this, the meta analysis of the unstandardized effect size between participants (i.e., the calculation of the median median-difference between phases) tacitly relies on equal variances between participants. Although, it should be noted that both standardized effect sizes (Ruscio's A and Hedges' g) do *not* rely on the assumption of equal variance between participants (indeed, this is one of the rationales for standardization), and so no exclusions based on baseline consistency are necessary for the correct interpretation of them. In order to highlight outliers, this package relies on between subject meta analysis of median absolute deviations of the data in phase A. The metafor package's influence.rma.uni() function is used to conduct leave one out analyses. Four separate metrics that can indicate whether a participant are calculated, and if one or more flag the participant as a potential outlier this variable is returned with a star ("*"). See the metafor package's documentation for more details. This variable should not be used to thoughtlessly exclude participants, but should be combined with insepction of the SCED plot and best judgement. Sensitivity analyses run with and wihtout any outliers can also be useful.
+#' @return trend_A ordinal regression slope between the phase A data points by timepoint. Treats the timepoints as ordinally spaced integers (e.g., rather than modelling them as dates). Can be used to exclude participants from consideration in meta analysis, e.g., on the basis that differences between phases can be difficult to interpret if improvement trends are observed in phase A. Sensitivity analyses can be conducted by excluding participants with phase A trends greater than a given absolute value (e.g., +/-0.3). 
+#' @return trend_B ordinal regression slope between the phase B data points by timepoint. Can indicate ongoing improvement in phase B.
+#' @return p Hypothesis test p value via permutation test assessing the differences in scores between the two phases. Calculated via Monte-Carlo simulation (10000 runs) rather than brute force.
+#' @return median_difference Difference in scores between the median values in the two phases. Because Ruscio's A effect size is probability based (see below) it can suffer from ceiling effects. I.e., when all timepoints in phase B are larger than all timepoints in phase A, Ruscio's A cannot distinguish futher between large and very large effect sizes. It can therefore be useful to report the unstandardized effect size as well as the standardized effect sizes. 
+#' @return ruscios_A Differences in scores between the two phases using Ruscio's A (Ruscio, 2008). The probability that a randomly selected timepoint in phase B is larger than a randomly selected timepoint in phase A. Ranges from 0 to 1, where 0.5 is equal chance. Highly similar to Area Under the Curve (AUC)/the Common Language Effect Size (CLES)/and the probability of superiority. A Cohen's d of 1.5 corrisponds to an A of 0.85.
+#' @return hedges_g Differences in scores between the two phases using Hedge's g effect size via bootstrapping, a version of Cohen's d that is bias corrected for small sample sizes. Identical range, interpretation and cutoffs as Cohen's d. Included here for familiarity: it's parametric assumtions (equal variances) and sensitivity to equal number of timepoints in A and B make it somewhat unrobust in many SCED contexts. In order to relax the assumption of normality a bootstrapped implemenation is employed.
 #' @export
 #' @examples
+#' \dontrun{
 #' sced_results <- sced_analysis(data = simulated_data)
+#' }
 
-sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adjust_probability_ceiling = TRUE, assess_deviation_outliers = FALSE) {
-  
-  require(tidyverse)
-  require(broom)
-  require(coin)
-  require(effsize)
-  require(bootES)
-  require(metafor)
-  
-  data(simulated_data)
-  
+sced_analysis <- function(data, 
+                          n_boots = 2000, 
+                          invert_effect_sizes = FALSE, 
+                          adjust_probability_ceiling = FALSE, 
+                          assess_deviation_outliers = FALSE) {
+
   # drop NAs from relevant columns
   data <- data %>%
-    drop_na(Timepoint, Score, Participant, Condition)
+    tidyr::drop_na(Timepoint, Score, Participant, Condition)
   
   # trends at baseline and post intervention
   trends <- data %>%
     # fit linear model for each participant and condition
     dplyr::group_by(Participant, Condition) %>%
     dplyr::mutate(timepoint_integer = row_number()) %>%
-    do(tidy(lm(rank(Score) ~ rank(timepoint_integer), data = .))) %>%
+    do(broom::tidy(lm(rank(Score) ~ rank(timepoint_integer), data = .))) %>%
     dplyr::ungroup() %>%
     # extract standardized beta estimates
     dplyr::filter(term == "rank(timepoint_integer)") %>%
@@ -51,25 +57,25 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
                   trend_ci_upr = estimate+std.error*1.96) 
   
   trend_A <- trends %>%
-    filter(Condition == "A") %>%
-    rename(trend_A = estimate,
-           trend_A_ci_lwr = trend_ci_lwr,
-           trend_A_ci_upr = trend_ci_upr) %>%
-    select(Participant, trend_A, trend_A_ci_lwr, trend_A_ci_upr)
+    dplyr::filter(Condition == "A") %>%
+    dplyr::rename(trend_A = estimate,
+                  trend_A_ci_lwr = trend_ci_lwr,
+                  trend_A_ci_upr = trend_ci_upr) %>%
+    dplyr::select(Participant, trend_A, trend_A_ci_lwr, trend_A_ci_upr)
   
   trend_B <- trends %>%
-    filter(Condition == "B") %>%
-    rename(trend_B = estimate,
-           trend_B_ci_lwr = trend_ci_lwr,
-           trend_B_ci_upr = trend_ci_upr) %>%
-    select(Participant, trend_B, trend_B_ci_lwr, trend_B_ci_upr)
+    dplyr::filter(Condition == "B") %>%
+    dplyr::rename(trend_B = estimate,
+                  trend_B_ci_lwr = trend_ci_lwr,
+                  trend_B_ci_upr = trend_ci_upr) %>%
+    dplyr::select(Participant, trend_B, trend_B_ci_lwr, trend_B_ci_upr)
   
   # median absolute deviation for each participant and condition to assess consistency within that phase
   deviations <- data %>%
     dplyr::group_by(Participant, Condition) %>%
     dplyr::summarize(mad = mad(Score), .groups = "keep") %>%
     dplyr::select(Participant, Condition, mad) %>% 
-    spread(Condition, mad) %>%
+    tidyr::spread(Condition, mad) %>%
     dplyr::rename(deviation_A = A,
                   deviation_B = B) 
   
@@ -77,7 +83,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     dplyr::group_by(Participant, Condition) %>%
     dplyr::summarize(n = n(), .groups = "keep") %>%
     dplyr::select(Participant, Condition, n) %>% 
-    spread(Condition, n) %>%
+    tidyr::spread(Condition, n) %>%
     dplyr::rename(n_A = A,
                   n_B = B)
   
@@ -96,7 +102,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     
     deviation_outliers <- metafor::influence.rma.uni(deviation_meta_fit)$inf %>%
       as.data.frame() %>%
-      rownames_to_column(var = "Participant") %>%
+      tibble::rownames_to_column(var = "Participant") %>%
       dplyr::rename(deviation_A_likely_outlier = `inf`) %>%
       dplyr::select(deviation_A_likely_outlier)
     
@@ -112,13 +118,13 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
   # p values via non-parametric permutation tests
   p_by_participant <- data %>%
     dplyr::group_by(Participant) %>%
-    do(p =
-         {
-           try(pvalue(independence_test(Score ~ as.factor(Condition),
-                                        distribution = approximate(nresample = n_boots*10), # needs more than other tests
-                                        data = .)), 
-               silent = TRUE)
-         }
+    dplyr::do(p =
+                {
+                  try(pvalue(coin::independence_test(Score ~ as.factor(Condition),
+                                               distribution = approximate(nresample = n_boots*10), # needs more than other tests
+                                               data = .)), 
+                      silent = TRUE)
+                }
     ) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(p = ifelse(str_detect(p, "Error"), NA, p),
@@ -136,22 +142,18 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     dplyr::select(Participant, median_difference)
   
   # bootstrapped Ruscio's nonparametric effect size A
-  # function defined elsewhere in this package
   ruscios_A_boot_by_participant <- data %>%
-    dplyr::group_by(Participant) %>%
-    do(ruscios_A_boot(variable = "Score",
-                      group = "Condition",
-                      data = .,
-                      value1 = "B",
-                      value2 = "A",
-                      B = n_boots,
-                      adjust_ceiling = adjust_probability_ceiling)) %>%
-    dplyr::ungroup()
-  
+    dplyr::select(-Timepoint) |>
+    group_by(Participant) |>
+    tidyr::nest() |>
+    dplyr::ungroup() |>
+    dplyr::mutate(A_res = purrr::pmap(list(data),
+                                      ruscios_A_boot)) |>
+    dplyr::select(-data) |>
+    tidyr::unnest(A_res) 
+
   # bootstrapped Hedges' g effect size (removes assumption of normality but not equality of variances or equal N per condition)
   hedges_g_boot <- function(data) {
-    require(bootES)
-    require(tidyverse)
     
     fit <- try(bootES::bootES(data,
                               R           = n_boots,
@@ -208,7 +210,7 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
     dplyr::left_join(median_change,                 by = "Participant") %>%
     dplyr::left_join(ruscios_A_boot_by_participant, by = "Participant") %>%
     dplyr::left_join(hedges_g_by_participant,       by = "Participant") %>%
-    ungroup()
+    dplyr::ungroup()
   
   # conditionally invert effect sizes results
   if (invert_effect_sizes == TRUE){
@@ -219,15 +221,15 @@ sced_analysis <- function(data, n_boots = 2000, invert_effect_sizes = FALSE, adj
                     hedges_g = hedges_g*-1,
                     hedges_g_ci_upr_temp = hedges_g_ci_lwr*-1,
                     hedges_g_ci_lwr = hedges_g_ci_upr*-1) %>%
-      select(-ruscios_A_ci_upr, -hedges_g_ci_upr) %>%
-      rename(ruscios_A_ci_upr = ruscios_A_ci_upr_temp,
-             hedges_g_ci_upr = hedges_g_ci_upr_temp) %>%
+      dplyr::select(-ruscios_A_ci_upr, -hedges_g_ci_upr) %>%
+      dplyr::rename(ruscios_A_ci_upr = ruscios_A_ci_upr_temp,
+                    hedges_g_ci_upr = hedges_g_ci_upr_temp) %>%
       # reorder columns
-      select(Participant, n_A, n_B, deviation_A, deviation_B,
-             trend_A, trend_A_ci_lwr, trend_A_ci_upr, trend_B, trend_B_ci_lwr, trend_B_ci_upr,
-             p, median_difference,
-             ruscios_A, ruscios_A_se, ruscios_A_ci_lwr, ruscios_A_ci_upr,
-             hedges_g, hedges_g_se, hedges_g_ci_lwr, hedges_g_ci_upr)
+      dplyr::select(Participant, n_A, n_B, deviation_A, deviation_B,
+                    trend_A, trend_A_ci_lwr, trend_A_ci_upr, trend_B, trend_B_ci_lwr, trend_B_ci_upr,
+                    p, median_difference,
+                    ruscios_A, ruscios_A_se, ruscios_A_ci_lwr, ruscios_A_ci_upr,
+                    hedges_g, hedges_g_se, hedges_g_ci_lwr, hedges_g_ci_upr)
   }
   
   return(results)

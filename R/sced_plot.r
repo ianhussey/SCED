@@ -1,22 +1,26 @@
 #' Plot data
 #'
 #' Plot data from an AB design SCED experiment, reordering the participants by the order in which they change from A to B condition.
+#' @import dplyr
+#' @import ggplot2
+#' @import scales
 #' @param data Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.
+#' @param show_MAD_interval If true, show an interval in the plot that is ±1 median absolute deviation.
 #' @export
 #' @examples
+#' \dontrun{
 #' sced_plot(data = simulated_data)
+#' }
 
 sced_plot <- function(data, show_MAD_interval = FALSE) {
-  require(tidyverse)
-  require(forcats)
   
   data_with_condition_change <- data %>% 
     dplyr::group_by(Participant) %>% 
     dplyr::summarize(condition_change = max(Timepoint[Condition == "A"], na.rm = TRUE) + 0.5) %>% 
     dplyr::right_join(data, by = "Participant") %>% 
     dplyr::group_by(Participant, Condition) %>% 
-    mutate(median_score = median(Score, na.rm = TRUE),
-           mad = mad(Score, na.rm = TRUE)) %>% 
+    dplyr::mutate(median_score = median(Score, na.rm = TRUE),
+                  mad = mad(Score, na.rm = TRUE)) %>% 
     dplyr::ungroup()
   
   intervention_point <- data %>% 

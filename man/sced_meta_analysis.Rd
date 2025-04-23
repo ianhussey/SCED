@@ -6,7 +6,6 @@
 \usage{
 sced_meta_analysis(
   results,
-  effect_size = "ruscios_A",
   baseline_trend_exclusion_criterion = NULL,
   baseline_variance_exclude_outliers = FALSE
 )
@@ -14,21 +13,22 @@ sced_meta_analysis(
 \arguments{
 \item{results}{Output of sced_analysis().}
 
-\item{effect_size}{Which standardized effect size should be meta analysed. Must be set to one of 'ruscios_A', 'A', 'hedges_g', or 'g'. Ruscio's A is more robust and is recommended; Hedges' g is included for familiarity.}
-
 \item{baseline_trend_exclusion_criterion}{If set to a numeric value, cases with a baseline trend (ie standardized beta OLS regression value for the timepoint A scores) with an absolute value greater than this numeric value will be excluded from the meta analysis.}
+
+\item{baseline_variance_exclude_outliers}{If TRUE, participants whose variance at baseline is flagged as an outlier by the sced_analysis() function are excluded from the meta-analysis. Useful for sensitivity analysis, for excluding participants from whom a stable baseline was not established relative to other participants.}
 }
 \description{
 Meta analyse the standardized effect sizes (Ruscio's A or Hedges' g) provided by sced_analyse.
-Uses the metafor package under the hood. 
+Uses the metafor package under the hood.
 Please note that the CIs reported in the meta analysis may differ from those reported by sced_analyse(), as the meta analysis uses the standard error for estimation rather than the empirical CIs, which can be asymmetric. When combined with the next point below, this means that the CIs in the meta analysis can be < 0 or > 1, outside the bounds of the observable values for Ruscio's A. If the meta analysed effect size intervals are < 0 or > 1 they can be reported as 0 or 1 instead.
-Meta analysis is done via a maximum likelihood random effects model using a gaussian link function for both Ruscio's A and Hedges' g effect sizes. In the case of Ruscio's A, this means that effect sizes are non parametric at the individual level, but the underlying effect is assumed to vary between participants following a normal distribution. Ruscio's A effect sizes are logit transformed prior to meta analysis and backtransformed for reporting.
+Meta analysis is done via a maximum likelihood random effects model using a gaussian link function.
 }
 \examples{
-results <- sced_analysis(data = simulated_data)
+\dontrun{
+sced_results <- sced_analysis(data = simulated_data)
 
 # fit meta
-sced_meta_fit <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
+sced_meta_fit <- sced_meta_analysis(results = sced_results)
 
 # return results
 sced_meta_fit$meta_effect_size
@@ -36,11 +36,10 @@ sced_meta_fit$meta_heterogeneity
 
 # forest plot
 metafor::forest(sced_meta_fit$model_fit,
-                xlab = "Probability of superiority (Ruscio's A)",
-                transf = boot::inv.logit, # convert logits back to probabilities (ie Ruscio's A)
-                mlab = heterogeneity_metrics_for_forest(sced_meta_fit$model_fit),
+                xlab = "Standardized Mean Difference",
                 digits = 2,
                 addcred = TRUE,
-                refline = 0.5)
-
+                refline = 0,
+                header = c("Participant", "SMD [95\% CI]"))
+}
 }

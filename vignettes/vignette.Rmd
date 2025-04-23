@@ -2,41 +2,42 @@
 title: "Single case experimental design & meta analysis using the SCED package"
 subtitle: "Vignette"
 author: "Ian Hussey"
-output:
-  html_document:
-    code_folding: hide
-    highlight: haddock
-    theme: flatly
-    toc: yes
-    toc_float: yes
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Single case experimental design & meta analysis using the SCED package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
-
+  
 ```{r include=FALSE}
 
-knitr::opts_chunk$set(message = FALSE, 
-                      warning = FALSE)
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 
 ```
 
 ```{r}
 
-# dependencies
+# dependencies of SCED package
 library(SCED)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(forcats)
+library(purrr)
+library(ggplot2)
+library(janitor)
+library(scales)
+library(RProbSup)
+library(metafor)
+library(bootES)
+library(broom)
+library(finalfit)
+library(coin)
+library(simstudy)
+
+# used in vignette but not required by SCED
 library(knitr)
 library(kableExtra)
-library(tidyverse)
-
-# dependencies required by SCED
-library(broom)
-library(coin)
-library(survival)
-library(effsize)
-library(bootES)
-library(boot)
-library(stringr)
-library(timesavers)  # from github/ianhussey
-library(finalfit)
-library(metafor)
 
 # disable scientific notation
 options(scipen = 999) 
@@ -53,13 +54,14 @@ Baseline trends also identified using standardized beta regression coefficients.
 
 ```{r}
 
-# save copy of simlulated data that is bunled with the package
-write_csv(simulated_data, "example_data.csv")
+# # save copy of simulated data that is bundled with the package
+# write_csv(simulated_data, "example_data.csv")
 
 # analyse
 results <- sced_analysis(data = simulated_data)
 
 results %>%
+  round_df(3) %>%
   kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
 
@@ -84,15 +86,15 @@ You can optionally exclude participants from the meta analysis using the `baseli
 ```{r}
 
 # meta analysis
-meta_analysis <- sced_meta_analysis(results = results, effect_size = "ruscios_A")
+meta_analysis <- sced_meta_analysis(results = results)
 
 # forest plot
 metafor::forest(meta_analysis$model_fit,
-                xlab = "Probability of superiority (Ruscio's A)",
+                xlab = "Standardized Mean Difference",
                 digits = 2,
-                transf = SCED::logodds_to_probability,  # convert log odds back to probabilities (ie Ruscio's A)
                 addcred = TRUE,
-                refline = 0.5)
+                refline = 0,
+                header = c("Participant", "SMD [95% CI]"))
 
 ```
 
@@ -106,11 +108,13 @@ In order to learn to use the package without using the data you wish to ultimate
 ```{r}
 
 # simulate data
-data <- simulate_data(participants = 2,     # two participants
-                      timepoints_a = 10,    # 10 timepoints pre 
-                      timepoints_b = 10,    # 10 post intervention
-                      cohens_d     = 2) %>% # Cohen's d = 2
+sim_data <- simulate_data(participants = 2,     # two participants
+                          timepoints_a = 10,    # 10 time points pre intervention 
+                          timepoints_b = 10,    # 10 time points post intervention
+                          cohens_d     = 2) %>% # Cohen's d = 2
   mutate(Participant = paste("Participant", Participant))
+
+sim_data
 
 ```
 
@@ -130,10 +134,9 @@ tau^2: The tau^2 metric of between participant heterogeneity, as produced by the
 ```{r}
 
 # returns power (1 - beta)
-power_meta(yi = 0.40, 
-           ni = 30,
-           k  = 6,
-           tau2 = 0.3)
+power_meta(yi = 0.40,  # Hedges g effect size powered for
+           ni = 30, # number of data points per phase
+           k  = 6, # number of participants
+           tau2 = 0.3) # heterogenetity
 
 ```
-

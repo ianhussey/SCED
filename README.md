@@ -48,7 +48,7 @@ Calculates the following statistics:
 
 ### sced_meta_analysis()
 
-Conduct a random effects meta analysis of the robust standardized effect sizes (Ruscio's A values) from `sced_analysis()`. Produces a meta analytic effect size, 95% confidence intervals, 95% credibility intervals (also referred to as prediction intervals), measures of heterogeneity between participants, and a forest plot of the effect sizes and meta analysed effect size. 
+Conduct a random effects meta analysis of the Standardized Mean Differences (Hedge's *g* values) from `sced_analysis()`. Produces a meta analytic effect size, 95% Confidence Intervals, 95% Prediction Intervals (which take between participant heterogeneity into account), measures of heterogeneity between participants. Optionally, you can produce a forest plot from the output of the function. 
 
 ### power_meta()
 
@@ -56,12 +56,14 @@ Rough *a priori* power analysis for SCED's between subjects meta analysis based 
 
 ## To do
 
-- Explicate that the expectation is that B>A, and add option to reverse (which is more than inverting the probability in cases of ties)
+- Add additional other terminology for *A* from Parker (2009), and relate A to tau.
+- Possibly implement tau effect size as it controls for baseline trends. 
+- Elaborate the preprint describing the package and methods.
 
-- Change Rusico's A point estimate to the whole sample estimate rather than the median bootstrap?
+## Changelog
 
-- update screenshots in readme
-
-- Add additional other terminology for *A* from Parker (2009), and relate A to tau    
+- 0.2
+	- Removed meta-analysis of Ruscio's A effect size. There are too many ways for this to go wrong, and too many compromises to be made (e.g., linear probability model has prediction problems, zero-one-inflated Beta regression is overly complex and probably requires a switch to Bayesian, logit transformations have problems with values at 0 or 1 or with no variance, etc). 
+	- Removed the adjust_ceiling options from sced_analysis, as this was an attempted solution to the problem of 0 or 1 values of Ruscio's A.
 
   

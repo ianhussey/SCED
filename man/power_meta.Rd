@@ -22,8 +22,10 @@ Statistical power (i.e., 1 - Beta), the probability of observing a significant r
 Rough approximation of power for the between participant meta analysis of effects, using equations derived from Valentine, Pigott, & Rothstein (2010, doi: 10.3102/1076998609346961), derived by Quintana (2017: https://towardsdatascience.com/how-to-calculate-statistical-power-for-your-meta-analysis-e108ee586ae8), and applied to within-subject SCED designs here.
 }
 \examples{
+\dontrun{
 power_meta(yi = 0.5, 
            ni = 25,
            k  = 6,
            tau2 = 1)
+}
 }

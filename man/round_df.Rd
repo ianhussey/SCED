@@ -15,5 +15,7 @@ round_df(df, digits = 3)
 This function rounds all numeric variables in a dataframe to the desired number of places. Non-numeric variables will be ignored.
 }
 \examples{
+\dontrun{
 round_df(my_data, digits = 2)
+}
 }

@@ -8,10 +8,12 @@
 #' @return Statistical power (i.e., 1 - Beta), the probability of observing a significant result given the parameters. 
 #' @export
 #' @examples
+#' \dontrun{
 #' power_meta(yi = 0.5, 
 #'            ni = 25,
 #'            k  = 6,
 #'            tau2 = 1)
+#' }
 
 power_meta <- function(yi, ni, k, tau2){
   

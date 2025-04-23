@@ -7,13 +7,15 @@
 format_pval_better(p)
 }
 \arguments{
-\item{value}{The p value to be formatted}
+\item{p}{The p value to be formatted}
 }
 \description{
 Tries to do a better job that base R's format.pval
 }
 \examples{
+\dontrun{
 format_pval_better(0.00000001)
 format_pval_better(0.01)
 format_pval_better(0.7)
+}
 }

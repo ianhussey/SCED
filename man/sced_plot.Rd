@@ -8,10 +8,14 @@ sced_plot(data, show_MAD_interval = FALSE)
 }
 \arguments{
 \item{data}{Experiment data. This must contain columns named "Participant", "Timepoint" (integer), "Score" (numeric; your DV), and "Condition" (must include only "A" and "B" as a string or factor). See the included simulated_data dataset for an example using \code{View(simulated_data)}.}
+
+\item{show_MAD_interval}{If true, show an interval in the plot that is ±1 median absolute deviation.}
 }
 \description{
 Plot data from an AB design SCED experiment, reordering the participants by the order in which they change from A to B condition.
 }
 \examples{
+\dontrun{
 sced_plot(data = simulated_data)
+}
 }
