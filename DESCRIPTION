@@ -1,5 +1,5 @@
 Package: SCED
-Title: Analyse data from AB Single Case Experimental Designs
+Title: An R package for simple and robust visualization, analysis, and meta-analysis of A-B Single Case Experimental Designs
 Version: 0.2
 Authors@R: person("Ian", "Hussey", email = "ian.hussey@icloud.com", role = c("aut", "cre"))
 Description: Analyse data from AB Single Case Experimental Designs using non-parametric frequentist tests (permutation tests) and effect sizes (the A metric: Ruscio, 2008; comparable to AUC, CLES, Non-overlap of all pairs [NAP], or the probability of superiority).

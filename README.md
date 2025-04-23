@@ -1,16 +1,20 @@
-# SCED
+# {SCED}: An R package for simple and robust visualization, analysis, and meta-analysis of A-B Single Case Experimental Designs
 
 An R package for robust analysis, plotting and meta analysis of data from A-B Single Case Experiment Designs using [exact tests](https://en.wikipedia.org/wiki/Exact_test), [robust effect sizes](https://www.ncbi.nlm.nih.gov/pubmed/18331151) and meta analysis of these effect sizes.
 
 ## Author
 
-Ian Hussey (ian.hussey -at- unibe.ch)
+Ian Hussey 2025 (ian.hussey -at- unibe.ch)
 
 ## License
 
-[GPLv3+](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3))
+[MIT license](https://www.tldrlegal.com/license/mit-license)
 
-You may use, copy, distribute and modify this software, as long as you (a) track any changes or additions you make to it (e.g., by submitting pull requests) and (b) make your changes or additions available to others.
+Basically, you can do whatever you want as long as you include the original copyright and license notice in any copy of the software/source.
+
+### Reference
+
+Hussey, I. (2025) SCED: An R package for simple and robust visualization, analysis, and meta-analysis of A-B Single Case Experimental Designs. Version 0.2. https://github.com/ianhussey/SCED
 
 ## Installation
 
@@ -59,6 +63,7 @@ Rough *a priori* power analysis for SCED's between subjects meta analysis based 
 - Add additional other terminology for *A* from Parker (2009), and relate A to tau.
 - Possibly implement tau effect size as it controls for baseline trends. 
 - Elaborate the preprint describing the package and methods.
+- Add missing references to understanding and reporting document in the /communciations folder. Maybe flesh out more details.
 
 ## Changelog
 
