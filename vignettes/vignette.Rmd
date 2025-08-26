@@ -17,7 +17,7 @@ knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 
 ```{r}
 
-# dependencies of SCED package
+# dependencies
 library(SCED)
 library(tibble)
 library(dplyr)
@@ -35,7 +35,6 @@ library(finalfit)
 library(coin)
 library(simstudy)
 
-# used in vignette but not required by SCED
 library(knitr)
 library(kableExtra)
 
@@ -83,7 +82,7 @@ Random effects meta analysis of standardized effect sizes across participants, p
 
 You can optionally exclude participants from the meta analysis using the `baseline_trend_exclusion_criterion` parameter. You can change which effect size is meta analysed using the `effect_size` parameter.
 
-```{r}
+```{r fig.height=5, fig.width=7}
 
 # meta analysis
 meta_analysis <- sced_meta_analysis(results = results)
