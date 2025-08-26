@@ -31,7 +31,6 @@
 #' \dontrun{
 #' sced_results <- sced_analysis(data = simulated_data)
 #' }
-
 sced_analysis <- function(data, 
                           n_boots = 2000, 
                           invert_effect_sizes = FALSE, 
@@ -114,23 +113,21 @@ sced_analysis <- function(data,
     
   }
   
-  
   # p values via non-parametric permutation tests
   p_by_participant <- data %>%
     dplyr::group_by(Participant) %>%
     dplyr::do(p =
                 {
-                  try(pvalue(coin::independence_test(Score ~ as.factor(Condition),
-                                               distribution = approximate(nresample = n_boots*10), # needs more than other tests
-                                               data = .)), 
-                      silent = TRUE)
+                  try(coin::pvalue(coin::independence_test(Score ~ as.factor(Condition),
+                                                           distribution = coin::approximate(nresample = n_boots*10), # needs more than other tests
+                                                           data = .)), 
+                      silent = FALSE)
                 }
     ) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(p = ifelse(str_detect(p, "Error"), NA, p),
                   p = as.numeric(p),
-                  p = format_pval_better(p),
-                  p = ifelse(is.na(p), "> .9999", p))
+                  p = format_pval_better(p))
   
   median_change <- data %>%
     dplyr::group_by(Participant) %>%
